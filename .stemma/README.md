@@ -4,8 +4,8 @@ A short description of the project.
 
 ## Links and abstract
 
-- **DOI** – 
-- **arXiv** – 
+- **DOI** –
+- **arXiv** –
 
 **Abstract**
 
