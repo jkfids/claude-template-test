@@ -1,6 +1,6 @@
 # Stemma
 
-> **Status:** v0.1: Under active development; conventions are still settling.
+> **Status:** Very WIP; conventions are still settling.
 
 A monorepository template for AI-assisted academic research, supporting the full project lifecycle—literature, proofs, numerics, reproducible results, and manuscript writing. Stemma is built around reusable agent workflows, emphasizing rigorous verification and flexible collaboration. It is designed to fit within a wider software stack, including AI tools, reference managers, and communication platforms.
 
@@ -49,7 +49,7 @@ Operations
 ```
 
 ### Release
-- **`src/`** – Durable, tested code in standard package layout.
+- **`src/`** – Reusable, tested code in standard package layout.
 - **`tests/`** – Unit, integration, and end-to-end tests for **`src/`**.
 - **`data/`** – Main data associated with the manuscript. Large datasets are recommended to be stored outside the repository.
 - **`reproduce/`** – Scripts for reproducing the manuscript's results and figures.
@@ -72,7 +72,7 @@ Operations
 - **`.agents/skills/`** – Reusable agent instructions and workflows (`SKILL.md` files).
 - **`.claude/`** – Claude Code configuration: slash commands and subagents.
 - **`init.sh`** – Sets up the template as a new project (runs once).
-- **`./stemma`** – Framework scripts, docs, and tooling (export, checks).
+- **`.stemma/`** – Framework layer: scripts, templates, and tooling (export, checks).
 
 ## Quickstart
 
