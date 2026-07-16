@@ -6,7 +6,7 @@ A monorepository template for AI-assisted academic research, supporting the full
 
 ## In practice
 
-## Overview
+## Repository overview
 
 The repository is divided into three zones. **Release** contains standard package files and everything slated for public release alongside a paper: code, data, figures, and manuscript source files. **Research** is the scientific and exploratory core—literature, investigations, and persistent project memory. **Operations** contains the agent instructions, workflows, and general tools for running the repository.
 

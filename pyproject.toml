@@ -24,10 +24,10 @@ version = "0.1.0"  # Static version; for dynamic versioning, see below.
 description = "A short description of the project."  # Replace with your project description.
 readme = "README.md"
 requires-python = ">=3.12"
-license = "MIT"
 authors = [
   { name = "A. Einstein", email = "albert.einstein@email.com" },
 ]
+# license = "MIT"  # Choose a license and uncomment this line.
 
 # Runtime dependencies (what src/ needs to run).
 dependencies = []
