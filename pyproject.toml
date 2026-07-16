@@ -1,0 +1,68 @@
+# ==============================================================================
+# pyproject.toml – Stemma
+#
+# Template adapted from (pypa/sampleproject/blob/main/pyproject.toml), with
+# sensible 2026 defaults, including hatchling for build backend, ruff for
+# linting, and pytest for tests. Fields marked {{...}} should be filled in by
+# init.sh or by hand.
+#
+# Guide (user-friendly):
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+#
+# Specification (technical, formal):
+# https://packaging.python.org/en/latest/specifications/pyproject-toml/
+# ==============================================================================
+
+[build-system]
+# Hatchling is a modern, extensible build backend for Python projects.
+requires = ["hatchling"]  # REQUIRED
+build-backend = "hatchling.build"
+
+[project]
+name = "project-name"  # REQUIRED; rename to your project name.
+version = "0.1.0"  # Static version; for dynamic versioning, see below.
+description = "A short description of the project."  # Replace with your project description.
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+  { name = "A. Einstein", email = "albert.einstein@email.com" },
+]
+
+# Runtime dependencies (what src/ needs to run).
+dependencies = []
+
+[project.optional-dependencies]
+# Install with:
+# pip install -e ".[dev]"
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.urls]
+# Source = "https://github.com/user/project-name"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/project_name"]
+
+# For dynamic versioning, replace `version = "..."` with `dynamic = ["version"]` under [project],
+# and uncomment the two lines below (with __about__.py containing: __version__ = "0.1.0").
+# [tool.hatch.version]
+# path = "src/project_name/__about__.py"
+
+# ==============================================================================
+# Tooling
+# ==============================================================================
+
+[tool.ruff]
+line-length = 100  # Modern non-claustrophobic choice
+target-version = "py312"
+
+[tool.ruff.lint]
+# pyflakes (F), pycodestyle (E/W), isort (I), bugbear (B), pyupgrade (UP).
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
