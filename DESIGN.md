@@ -1,10 +1,12 @@
 # DESIGN.md — Stemma: an AI-assisted research monorepo template
 
-> **Status: living design document, exploratory.**
-> This repository is a domain-agnostic *template* for AI-assisted academic research.
-> The design below is high-level on purpose: structural commitments are minimal, and
-> most mechanics are deliberately left as open questions to be settled by piloting
-> the template against a real project and feeding findings back here.
+> **Status: living design document, exploratory.** This repository is a
+> domain-agnostic *template* for AI-assisted academic research. The design
+> below is high-level on purpose: structural commitments are minimal and
+> provisional — the repository's shape, including the investigation
+> structure, is a current working form, not a settled one. Most mechanics
+> are deliberately left as open questions to be settled by piloting the
+> template against a real project and feeding findings back here.
 >
 > This file documents the *template's* design and is a template-development
 > artifact: it lives in the Stemma repository and does not travel into
@@ -28,38 +30,53 @@ run real work through it → return findings → revise.
 
 ## 2. Principles
 
-**P1 — The repository is the shared memory.**
-Agents are stateless; humans forget; chat scrolls away. Durable state lives in the
-repo, where both humans and agents read it. Agent work ends with a write-back (a
-diff); long-running work keeps its own log. The repository — not a vendor memory
-feature — is canonical, because only the repository is shared, reviewable, and
-exportable. Durable state is also what makes agent workflows *testable*: a
-workflow whose output is a diff can be asserted against.
+**P1 — The repository is the shared memory.** Agents are stateless; humans
+forget; chat scrolls away. Durable state lives in the repo, where both humans
+and agents read it. Agent work ends with a write-back (a diff); long-running
+work keeps its own record. The repository — not a vendor memory feature — is
+canonical, because only the repository is shared, reviewable, and exportable.
+Durable state is also what makes agent workflows *testable*: a workflow whose
+output is a diff can be asserted against.
 
-**P2 — No conclusion enters canonical memory on conversational confidence alone.**
-Agents produce plausible text faster than humans can check it. The gate is not
-"who did the work" (nearly everything is AI-assisted) but *how knowledge is
-accepted*: canonical entries arrive as reviewable diffs, and a human performs the
-acceptance. Concretely: agents open PRs and never merge them — **merging is the
-human acceptance act** (§5). Auto-merge is acceptable only where the acceptance
-criterion is machine-checkable (dependency bumps on green CI), which canonical
-knowledge never is.
+**P2 — No conclusion enters canonical memory on conversational confidence
+alone.** Agents produce plausible text faster than humans can check it. The
+gate is not "who did the work" (nearly everything is AI-assisted) but *how
+knowledge is accepted*: canonical entries arrive as reviewable diffs, and a
+human performs the acceptance. Concretely: agents open PRs and never merge
+them — **merging is the human acceptance act** (§5). Auto-merge is acceptable
+only where the acceptance criterion is machine-checkable (dependency bumps on
+green CI), which canonical knowledge never is.
 
-**P3 — Second-use rule.**
-Add structure only after the need is felt twice. It applies to files (DECISIONS
-was cut, then revived when a real category emerged), directories (no `writeups/`
-until notes/ clutters), subdirectories (`.stemma/` stays flat), branches (no dev
-branch — the zone/export model already separates tooling from releases), and
-skills (ship few; bloated instruction files measurably degrade agents). Contracts
-state bars; prompts state formats; neither demands content whose value varies by
-entry ("rationale where it isn't obvious", not mandatory fields). Going
-lean→structured later is cheap; walking back unfilled structure is not.
+**P3 — Second-use rule.** Add structure only after the need is felt twice. It
+applies to files (DECISIONS was cut, then revived when a real category
+emerged), directories (no `writeups/` until notes/ clutters), subdirectories
+(`.stemma/` stays flat), branches (no dev branch — the zone/export model
+already separates tooling from releases), and skills (ship few; bloated
+instruction files measurably degrade agents). Contracts state bars; prompts
+state formats; neither demands content whose value varies by entry ("rationale
+where it isn't obvious", not mandatory fields). Going lean→structured later is
+cheap; walking back unfilled structure is not.
+
+**P4 — Friction scales with epistemic weight, not with actor or ceremony.**
+Research is open-ended; the Research zone is frictionless by design, and
+code-base change hygiene is not imposed on it. Strict hygiene (PRs, CI,
+branch protection) belongs to the Release zone, where correctness is the bar.
+In the Research zone there is exactly one gate — acceptance into canonical
+memory (P2) — and everything before it is direct, ungated work. The
+corollary is **readable over auditable**: the engaged researcher, not an
+audit trail, is the integrity mechanism. Research documents are written to be
+read; no file or section exists whose purpose is procedural rather than
+scientific, because artifacts maintained dutifully rather than for a reader
+train the eye to skim. Researcher ownership — steering the work, and
+genuinely understanding what is accepted at merge — is what P2's gate relies
+on, and it is a stated assumption of this design (§10).
 
 ## 3. Structure
 
-Three zones, distinguished by what crosses the export boundary.
+Three zones, distinguished by what crosses the export boundary. The tree
+below is the current working shape; the pilot may reshape it.
 
-```text
+```
 Release                              # ships with the paper
   README.md
   src/project_name/                  # real default name; init renames it
@@ -82,7 +99,9 @@ Research                             # private; never exported
   ├── DECISIONS.md                   # project-level choices + rationale
   ├── QUESTIONS.md                   # open unknowns; Resolved routing index
   ├── SURVEY.md                      # literature synthesis
-  ├── investigations/  (_template/)  # bounded, branch-per, closed by PR
+  ├── investigations/
+  │   ├── _template/                 # README.md, ANALYSIS.md, REPORT.md
+  │   └── <slug>/                    # bounded dossier; branch-per, closed by PR
   ├── literature/      (_template.md)# per-source notes by citekey
   ├── meetings/        (_template.md)
   ├── notes/                         # logbook, writeups, working notes
@@ -107,33 +126,64 @@ The research files are organised by *evidential status*, which tells a reader
 (especially an agent) what to trust:
 
 - **Canonical** — `FINDINGS.md` (what the project is prepared to rely on) and
-  `DECISIONS.md` (what it chose to do, and why). FINDINGS records truths;
-  DECISIONS records choices; each contract states the boundary from its side.
+`DECISIONS.md` (what it chose to do, and why). FINDINGS records truths;
+DECISIONS records choices; each contract states the boundary from its side.
 - **Provenance** — the evidence canonical entries cite: a closed investigation,
-  a writeup in `notes/`, a legible `workbench/` directory, or a citation key for
-  verified external results. Provenance is heterogeneous by design; the FINDINGS
-  entry's link says which kind.
+a writeup in `notes/`, a legible `workbench/` directory, or a citation key for
+verified external results. Provenance is heterogeneous by design; the
+canonical entry's link says which kind. A closed investigation is a
+self-contained dossier: `README.md` carries the question, scope, answer
+criterion, and final state; `ANALYSIS.md` is the technical record sufficient
+to understand, check, and reproduce the work; `REPORT.md` is the final,
+self-contained account — FINDINGS provenance links land on the report.
+While an investigation is active, everything in it is provisional; merging
+its closing PR accepts the completed dossier as project provenance.
 - **Coordination** — `STATUS.md`: tasks, queue, active investigations. A rough
-  snapshot, not evidence; rewritten, never appended. Active-investigation lines
-  are touched only at charter and close (write-once-per-investigation), so
-  branches never contend over it.
+snapshot, not evidence; rewritten, never appended.
 - **Identified unknowns** — `QUESTIONS.md`: research-significant open questions,
-  phrased so an answer could be recognised. Questions resolve however the answer
-  arrives (investigation, promoted work, a decision, the literature); the
-  Resolved section is a routing index that points at the *most canonical record*
-  of the answer — never at raw provenance or PR numbers — and preserves original
-  phrasing so old uncertainties are not re-opened.
-- **Raw** — `notes/`, `workbench/`, `meetings/`, investigation logs.
-  Direct-commit, no ceremony; capture must stay friction-free.
+phrased so an answer could be recognised. Questions resolve however the answer
+arrives (investigation, promoted work, a decision, the literature); the
+Resolved section is a routing index that points at the *most canonical record*
+of the answer — never at raw provenance or PR numbers — and preserves original
+phrasing so old uncertainties are not re-opened.
+- **Raw** — `notes/`, `workbench/`, `meetings/`, and everything inside an
+*active* investigation. Direct-commit, no ceremony; capture must stay
+friction-free. Raw records may support a conclusion but are not canonical by
+themselves.
+
+**Investigations are organised by kind of knowledge, not by lifecycle
+moment.** Each investigation directory holds three files with distinct roles:
+
+- `README.md` — the control center: question, scope, answer criterion, and
+  current state. Concise, current, and high-level; a researcher or agent
+  should grasp where things stand without reading the analysis.
+- `ANALYSIS.md` — the living technical record: synthesis, derivations,
+  figures, interpretation. Rewritten and reorganised freely as understanding
+  improves; materially useful history, including negative results and dead
+  ends, is preserved as content (a characterized dead end is a result).
+  Structure is free — the file's organisation is the science's own.
+- `REPORT.md` — the final concise account, completed when preparing the
+  closing PR. Self-contained like a short scientific report, and the primary
+  investigation artifact shared with collaborators. **No new science**: every
+  claim must be supported by `ANALYSIS.md` or the artifacts it cites.
+
+No fixed subdirectories for scripts, figures, data, or scratch are created by
+default; an investigation adds supporting artifacts only when the work
+requires them, organising them however suits. There is no chronological log
+file: git history is the incidental chronology, and commit messages should say
+what changed scientifically. Reusable code, manuscript changes, and other
+release-facing artifacts follow their normal repository workflows rather than
+being hidden inside the investigation dossier.
 
 **Knowledge flows upward, and the promotion path is explicit.** Rough work
 (workbench, chat conclusions, collaborator results) becomes canonical via a
-*writeup*: a self-contained note (claim, support, scope, caveats, pointers to raw
-work) that an agent can draft (`write-up` skill) and that travels in a promotion
-PR together with the FINDINGS entry citing it. Merging that PR is the acceptance
-(P2). Conclusions with no repo evidence are staged as notes, not filed as
-findings. SURVEY holds what the field established; FINDINGS holds what this
-project established (including "we verified imported result X in our regime").
+*writeup*: a self-contained note (claim, support, scope, caveats, pointers to
+raw work) that an agent can draft (`write-up` skill) and that travels in a
+promotion PR together with the FINDINGS entry citing it. Merging that PR is
+the acceptance (P2). Conclusions with no repo evidence are staged as notes,
+not filed as findings. SURVEY holds what the field established; FINDINGS holds
+what this project established (including "we verified imported result X in our
+regime").
 
 **House style for memory files:** a `>` blockquote carries each file's *editing
 contract* (visible to humans, distinct from content); HTML comments carry
@@ -145,36 +195,85 @@ plain prose.
 ## 5. Working assumptions (adopted for now, revisable after the pilot)
 
 - **PRs, two tiers.** *Mechanical (path-based, branch protection):* `src/`,
-  `tests/` require a PR for anyone. *Convention (actor-based, in `AGENTS.md`):*
-  agents never commit those directly; agent edits to `manuscript/` are PRs while
-  human drafting is direct; investigations close with one PR; findings entered by
-  agent hands arrive by PR even when a human asked. **Agents open PRs; humans
-  merge them.** Everything else — notes, workbench, STATUS/QUESTIONS/SURVEY
-  housekeeping, DECISIONS entries (recording a decision is making it; the commit
-  witnesses it), literature, meetings — is direct commit.
-- **Investigations are bounded by construction** (charter test: could you
-  recognise an answer?), branch-per-investigation, charter committed to main at
-  birth, one closing PR as the gate. Investigations mark *work, not intentions*:
-  they are chartered when verification work actually begins, never auto-created
-  from conversations — an investigations/ directory of husks would debase the
-  provenance the hierarchy depends on.
+`tests/` require a PR for anyone. *Convention (actor-based, in `AGENTS.md`):*
+agents never commit those directly; agent edits to `manuscript/` are PRs while
+human drafting is direct; each investigation closes with one PR; findings
+entered by agent hands arrive by PR even when a human asked. **Agents open
+PRs; humans merge them.** Everything else — notes, workbench,
+STATUS/QUESTIONS/SURVEY housekeeping, DECISIONS entries (recording a decision
+is making it; the commit witnesses it), literature, meetings, and all work
+inside an active investigation — is direct commit.
+- **Investigations are bounded by construction.** The charter test is: could
+you recognise an answer if you saw one? The answer criterion need not be
+binary — a characterization with stated uncertainty, a decision-enabling
+comparison, or "cannot be determined, because…" all qualify — but if no
+recognisable endpoint can be stated, the work is not ready to be an
+investigation and stays in workbench/ or notes/ until one crystallizes.
+Investigations mark *work, not intentions*: they are created when substantive
+work begins, never automatically from conversations or merely because a
+question exists.
+
+  The investigation lifecycle is deliberately light — one gate, at the end:
+
+  1. **Charter.** Create the branch; copy `_template/` to
+     `investigations/<slug>/`; fill the README (question, scope, answer
+     criterion). Add the investigation's line to `STATUS.md` on main (direct
+     commit; the skill may do this automatically).
+  2. **Work.** Direct commits on the branch, no ceremony. Keep the README's
+     current state up to date and steer the science in `ANALYSIS.md`;
+     `REPORT.md` may be drafted as sections stabilise but never leads —
+     claims appear in the analysis first. If the question itself changes,
+     close and start a new investigation.
+  3. **Close.** Complete `REPORT.md`; open the one closing PR, carrying the
+     full dossier together with the affected memory files (`STATUS.md` line
+     closed; `FINDINGS.md`, `DECISIONS.md`, `QUESTIONS.md`, `SURVEY.md` as
+     applicable). The PR proposes the conclusion; **the human merges, and the
+     merge is the acceptance.** After close, the dossier changes only by PR.
+
+  A closing PR should be confined to its own investigation directory and the
+  directly affected memory files — no unrelated housekeeping, no other
+  investigations, no release-facing implementation work. An investigation
+  abandoned early with nothing established simply deletes its branch; one
+  abandoned with something worth keeping closes normally, with a short report
+  recording what was established and why work stopped.
+
+- **Charter changes are consent-gated, not ceremony-gated.** There is no
+amendment trail, no frozen charter, and no mid-flight visibility on main —
+readable over auditable (P4). The protection is an actor rule in `AGENTS.md`:
+**agents do not modify an investigation's question, scope, or answer
+criterion without the researcher's explicit go-ahead** — propose the change
+and the reason, then wait. The researcher edits their own charter freely.
+The agent's further duty is to notice when incremental refinement has become
+replacement and say so, since scope creep is the failure mode neither party
+sees from inside.
 - **Export is a fail-closed allowlist**; nothing in Release may depend on
-  anything not exported (the one silently-violated invariant; mechanically
-  checked by `check_zones.py`). Manuscript is a self-contained TeX root: figures
-  are generated by `reproduce/` and committed to `manuscript/figures/` so it
-  compiles alone (Overleaf, arXiv submission).
+anything not exported (the one silently-violated invariant; mechanically
+checked by `check_zones.py`). Manuscript is a self-contained TeX root: figures
+are generated by `reproduce/` and committed to `manuscript/figures/` so it
+compiles alone (Overleaf, arXiv submission).
 - **Release READMEs** are templates: fixed conventions plus HTML-comment prompts,
-  written author-facing but reproducer-safe (the export audience vetoes
-  framework vocabulary), finalised at export. Soft on preferences (script
-  granularity), firm on invariants (figure destination, no non-exported imports).
+written author-facing but reproducer-safe (the export audience vetoes
+framework vocabulary), finalised at export. Soft on preferences (script
+granularity), firm on invariants (figure destination, no non-exported imports).
 - **Linting follows the code:** ruff scoped to `src/`/`tests/`; hygiene hooks
-  (whitespace, keys, merge-conflict) repo-wide — the ungated housekeeping lane
-  has no human backstop, so it needs machine hygiene most. Content-rewriting
-  formatters (pyproject-fmt) never run on template files (they mangle
-  placeholders); commented in config with a do-not-enable-until-instantiated
-  warning.
+(whitespace, keys, merge-conflict) repo-wide — the ungated housekeeping lane
+has no human backstop, so it needs machine hygiene most. Content-rewriting
+formatters (pyproject-fmt) never run on template files (they mangle
+placeholders); commented in config with a do-not-enable-until-instantiated
+warning.
 - Conventions from day one: one-sentence-per-line LaTeX; environments from
-  `pyproject.toml` alone; figures only from `reproduce/`.
+`pyproject.toml` alone; figures only from `reproduce/`; investigation reports
+and literature notes cite from the project's shared bibliography (one
+citekey space across `literature/`, investigations, and `manuscript/`).
+- **Deferred with named triggers** (second-use rule): a chronological
+`LOG.md` returns if session-level history proves to have no home or the
+analysis bloats with it; a curated "investigation record" section inside
+ANALYSIS is the preferred reinstatement form. A `render_report.sh`
+(pandoc-based md→PDF for REPORT.md, stripping the contract blockquote) is
+built when the shareable PDF is wanted in practice, not before. Fixed
+section skeletons for ANALYSIS and REPORT (paper-style numbered sections,
+verification checklists) were drafted and set aside; they return
+section-by-section as the pilot shows each earns its place.
 
 ## 6. Framework layer: `.stemma/`
 
@@ -183,7 +282,7 @@ scaffold it deletes. `.stemma/` is a dotdir to signal *managed machinery — run
 it, don't hand-edit it*. Agents run its scripts when asked (export, checks) but
 do not modify its internals in an instantiated project.
 
-```text
+```
 .stemma/
   README.md            # the framework's own readme (what this layer is)
   export.sh            # Release → fresh repo; verify; stop before pushing
@@ -195,40 +294,45 @@ do not modify its internals in an instantiated project.
 ```
 
 Flat until the script count warrants subdirectories. **Template taxonomy:**
-*instantiation templates* (rendered once) live in `.stemma/templates/`; *runtime
-templates* (copied repeatedly: investigation `_template/`, literature and meeting
-`_template.md`) live in place in `research/`, editable as the project's
-methodology evolves; *singleton stubs* (the memory files) ship as the files
-themselves, structure and prompts baked in. LICENSE is none of these — a
+*instantiation templates* (rendered once) live in `.stemma/templates/`;
+*runtime templates* (copied repeatedly: investigation `_template/`, literature
+and meeting `_template.md`) live in place in `research/`, editable as the
+project's methodology evolves; *singleton stubs* (the memory files) ship as the
+files themselves, structure and prompts baked in. LICENSE is none of these — a
 canonical legal text `init.sh` selects and stamps (copyright line only), never a
 hand-maintained skeleton (legal-text drift is not "close enough").
 
 **Agent instruction, three tiers:** `AGENTS.md` the sparse router (map,
-always-apply rules, precedence over local READMEs, pointer to `.stemma/`
-scripts); skills the procedures (v0.1: `new-investigation`, plus `write-up` for
-the promotion path — both artifact-producing, hence world-state-testable);
-`.claude/` the vendor remainder. Facts sort by scope: everywhere → AGENTS.md;
-named-task procedure → skill; this-directory-only → its README; and each
-memory file's own contract governs itself.
+always-apply rules — including the charter consent rule and
+agents-open-PRs-humans-merge — precedence over local READMEs, pointer to
+`.stemma/` scripts); skills the procedures (v0.1: `new-investigation`, plus
+`write-up` for the promotion path — both artifact-producing, hence
+world-state-testable); `.claude/` the vendor remainder. Facts sort by scope:
+everywhere → AGENTS.md; named-task procedure → skill; this-directory-only →
+its README; and each memory file's own contract governs itself.
 
 ## 7. Testing
 
 - **Project code** — `ci.yml` (travels): install `.[dev]` across 3.12/3.13/3.14,
-  pytest, plus `pre-commit run --all-files` as the unbypassable enforcement copy
-  of the hooks. The template ships a working `project_name` package and smoke
-  test, so this CI passes on the template repo itself.
+pytest, plus `pre-commit run --all-files` as the unbypassable enforcement copy
+of the hooks. The template ships a working `project_name` package and smoke
+test, so this CI passes on the template repo itself.
 - **Framework tooling** — tested in the Stemma repo's own CI (`stemma.yml`,
-  path-filtered to `.stemma/**` — path-filtering's first legitimate use), tests
-  in `.stemma/tests/`, template-repo-only. Highest value: instantiation test
-  (init in a sandbox; assert a valid project, no surviving placeholders) and
-  export-safety test (plant secrets in research/; assert only Release ships and
-  the export installs/tests green with research/ absent). Shell → bats. Deferred
-  until the scripts have real logic; scripts should take args (not only
-  interactive prompts) so tests can drive them.
+path-filtered to `.stemma/**` — path-filtering's first legitimate use), tests
+in `.stemma/tests/`, template-repo-only. Highest value: instantiation test
+(init in a sandbox; assert a valid project, no surviving placeholders) and
+export-safety test (plant secrets in research/; assert only Release ships and
+the export installs/tests green with research/ absent). Shell → bats. Deferred
+until the scripts have real logic; scripts should take args (not only
+interactive prompts) so tests can drive them.
 - **Agent behaviour** — not cheaply CI-able; test the *world-state a workflow
-  must leave* (was the writeup written? does STATUS list the investigation? did
-  the closing PR touch only its directory?). P1's payoff: output-is-a-diff means
-  the fixture is free.
+must leave*. For investigations, deterministic checks can assert that the
+dossier's README contains a recognisable question and answer criterion, that
+`STATUS.md` lists the investigation while active, that `REPORT.md` is
+non-empty in the closing PR and the README's current state points at it, and
+that the closing PR's changed paths are confined to the investigation's own
+directory plus the affected root memory files. P1's payoff is that
+output-is-a-diff makes these workflows testable without an LLM judge.
 
 ## 8. Instantiation
 
@@ -253,44 +357,65 @@ README, `.stemma/tests/`. The tools travel; the tools' tests do not.
 ## 10. Open questions (for the pilot)
 
 - Does the promotion path get used, or routed around (FINDINGS entries appearing
-  without writeups)? Does the humans-merge rule hold?
+without writeups)? Does the humans-merge rule hold?
+- **The ownership assumption:** the frictionless investigation model assumes an
+engaged researcher steering the work — that is its integrity mechanism (P4).
+If an investigation runs in low-touch mode, does the question drift without
+anyone noticing? Does close-time review alone suffice to catch it?
+- Does the investigation README stay a concise control center, or drift into
+duplicating the analysis? Does ANALYSIS hold its boundary with the README?
+- Does free-form ANALYSIS/REPORT structure stay reviewable and readable, or
+do closing PRs turn out to need fixed sections (verification, limitations)
+back?
+- Does REPORT's self-containment drift into disagreement with ANALYSIS
+(the same result stated twice, diverging)? Does the no-new-science rule
+survive real closes?
+- Is the absence of a chronological log ever actually felt (session history
+with no home; analysis bloating with narrative)?
 - Does DECISIONS fill, or was its revival premature? Does QUESTIONS' Resolved
-  section fill (working) or stay empty while Open grows (graveyard → fold into
-  STATUS)?
+section fill (working) or stay empty while Open grows (graveyard → fold into
+STATUS)?
 - Does STATUS's Summary (which now carries the "why" for the task list) stay
-  current, or does the inline-why-per-task pattern prove more self-maintaining?
+current, or does the inline-why-per-task pattern prove more self-maintaining?
 - Skills across surfaces; progressive disclosure; whether `write-up` and
-  `new-investigation` suffice or a meeting routine earns its place.
+`new-investigation` suffice or a meeting routine earns its place.
 - Framework model: do projects actually `copier update`, or drift?
 - Literature wiring (reference manager/MCP); grep-level vs AST-level zone check;
-  lockfiles (uv); Issues vs STATUS for tasks; data at scale (DVC/Zenodo);
-  non-coder entry points.
+lockfiles (uv); Issues vs STATUS for tasks; data at scale (DVC/Zenodo);
+non-coder entry points; the md→PDF render path for reports.
 - Exact skills scan path (`.agents/skills/` vs `.claude/skills/`) — verify
-  against current Agent Skills docs at scaffold time.
+against current Agent Skills docs at scaffold time.
 
 ## 11. v0.1 scope
 
 The tree above with its stubs (five memory files in house style, investigation
-`_template/`, literature/meeting templates, Release READMEs, manuscript skeleton
-compiling green), pre-commit + CI green on the shipped package, a sparse
-`AGENTS.md`, two skills (`new-investigation`, `write-up`), `check_zones.py` at
-grep level, and stub `export.sh`/`init.sh` carrying their spec in comments. No
-framework tests yet. **Pilot:** run one real bounded investigation and one real
+`_template/` — `README.md`, `ANALYSIS.md`, `REPORT.md`, deliberately minimal:
+contract blockquotes plus prompts, structure otherwise free — literature/meeting
+templates, Release READMEs, manuscript skeleton compiling green), pre-commit +
+CI green on the shipped package, a sparse `AGENTS.md` (carrying the charter
+consent rule and agents-open-PRs-humans-merge), two skills
+(`new-investigation`, `write-up`), `check_zones.py` at grep level, and stub
+`export.sh`/`init.sh` carrying their spec in comments. No framework tests yet.
+No log file, no render script, no fixed report skeleton — each deferred with a
+named trigger (§5). **Pilot:** run one real bounded investigation and one real
 workbench→FINDINGS promotion through the skills; log what fought back; findings
 return here as issues; v0.2 follows the evidence.
 
 ---
 
-*Changes from the prior draft:* renamed STATE→**STATUS** and revived
-**DECISIONS**; recast the memory files as an **epistemic hierarchy**
-(canonical / provenance / coordination / unknowns / raw) replacing the
-now/known/unknown rhythm framing; added the **promotion path** (workbench →
-writeup → promotion PR) and sharpened P2 into "**agents open PRs; humans
-merge**" — acceptance is the merge act, uniform across actors; QUESTIONS'
-Resolved became a **layered routing index** (points at canonical records, never
-raw provenance); FINDINGS provenance made **heterogeneous by design**; no
-`findings/`/`writeups/` directory (second-use; writeups are notes); added the
-**house style** (blockquote = editing contract, strictly), the **template
-taxonomy** (instantiation vs runtime vs singleton; LICENSE excluded), and the
-no-dev-branch decision; corrected the placement rule (agent-discovered files at
-root, only invoked-by-path machinery in `.stemma/`).
+*Changes from the prior draft:* settled the investigation dossier as three
+files organised by **kind of knowledge** — `README.md` (control center),
+`ANALYSIS.md` (living technical record), `REPORT.md` (final self-contained
+account; the FINDINGS landing page and the collaborator-shareable artifact,
+under a **no-new-science** rule) — after cycling through and rejecting
+charter/log/review variants; cut `LOG.md` (git is the chronology; curated
+reinstatement form named) and all amendment/freeze machinery on the charter,
+replaced by a **consent rule** (agents propose charter changes and wait) and
+the scope-discipline line (question changes ⇒ close and start anew); moved the
+whole lifecycle to a **single closing PR** (charter happens on the branch;
+only the STATUS line touches main mid-flight); added **P4 — friction scales
+with epistemic weight; readable over auditable; researcher ownership is the
+integrity mechanism** — and recorded its assumption as a pilot question;
+templates shipped deliberately minimal, with drafted skeletons, the log, and
+the render script all **deferred with named triggers** rather than silently
+dropped.

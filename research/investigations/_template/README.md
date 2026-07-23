@@ -29,6 +29,6 @@
 ## Directory
 
 - [`ANALYSIS.md`](ANALYSIS.md) – Detailed analysis and reproduction record.
-- [`REPORT.md`](REPORT.md) – Final investigation report.
+- [`REPORT.md`](REPORT.md) – Final investigative report.
 
 <!-- Link additional important files and directories as they arise. -->
