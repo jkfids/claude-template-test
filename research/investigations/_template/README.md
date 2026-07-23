@@ -3,7 +3,7 @@
 > Control center for one bounded investigation. Keep this file concise and up
 > to date. If the question itself changes, close this investigation and start
 > a new one. Detailed methods, evidence, and reproduction belong in
-> `ANALYSIS.md`. The final, revised account lives in `REPORT.md`.
+> `ANALYSIS.md`. The final, reviewed account lives in `REPORT.md`.
 
 **Opened:** <!-- YYYY-MM-DD -->
 

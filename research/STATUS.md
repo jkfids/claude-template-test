@@ -21,4 +21,4 @@
 ## Active investigations
 
 <!-- Directory names of active investigations. Added at charter, removed by the
-     closing PR; details belong in the investigation's own log. -->
+     closing PR; details belong in the investigation directory. -->
