@@ -3,13 +3,13 @@
 > **Status: living design document, exploratory.**
 > This repository is a domain-agnostic *template* for AI-assisted academic research.
 > The design below is high-level on purpose: structural commitments are minimal, and
-> most mechanics (verification, literature, meetings, permissions) are deliberately
-> left as open questions to be settled by piloting the template against a real
-> project in a separate repository and feeding findings back here.
+> most mechanics are deliberately left as open questions to be settled by piloting
+> the template against a real project and feeding findings back here.
 >
-> This file documents the *template's* design and is a template-development artifact:
-> it lives in the Stemma repository and does not travel into instantiated projects
-> (see §8). A project's own overview lives in `PROJECT.md`.
+> This file documents the *template's* design and is a template-development
+> artifact: it lives in the Stemma repository and does not travel into
+> instantiated projects (§9). A project's own overview lives in `PROJECT.md`;
+> a project's own decision log lives in `research/DECISIONS.md`.
 
 ## 1. Purpose
 
@@ -20,319 +20,277 @@ usable by collaborators who are not strong programmers.
 
 The design is provider-neutral. Two open standards carry the portable layer:
 `AGENTS.md` (read by most agent tools) for project instructions, and the Agent
-Skills format (`SKILL.md` files, read across Claude Code, Codex, Cursor, Gemini,
-Copilot, and others) for reusable procedures. Only genuinely tool-specific
-automation (subagents, slash-command ergonomics) lives in a vendor directory.
+Skills format (`SKILL.md`) for reusable procedures. Only genuinely tool-specific
+automation lives in a vendor directory (`.claude/`).
 
-Development loop: design the template here → instantiate it in a real project repo →
-run real work through it → return findings as feedback → revise.
+Development loop: design the template here → instantiate it in a real project →
+run real work through it → return findings → revise.
 
 ## 2. Principles
 
 **P1 — The repository is the shared memory.**
 Agents are stateless; humans forget; chat scrolls away. Durable state lives in the
-repo, where both humans and agents can read it. Agent work should end with a
-write-back (a diff), and long-running work keeps its own log so continuity survives
-sessions. The repository — not a vendor memory feature — is canonical, because only
-the repository is shared, reviewable, and exportable. Durable, inspectable state is
-also what makes agent workflows *testable*: a workflow whose output is a diff can be
-asserted against; one whose output is only chat cannot.
+repo, where both humans and agents read it. Agent work ends with a write-back (a
+diff); long-running work keeps its own log. The repository — not a vendor memory
+feature — is canonical, because only the repository is shared, reviewable, and
+exportable. Durable state is also what makes agent workflows *testable*: a
+workflow whose output is a diff can be asserted against.
 
-**P2 — Agent output is unverified by default.**
-Agents produce plausible text faster than humans can check it. The template must make
-verification status visible and require some gate before agent work reaches
-release-facing directories. For investigations the gate is the closing PR (§4);
-finer mechanics — statuses, reviewer agents — remain open questions for the
-pilot (§6).
+**P2 — No conclusion enters canonical memory on conversational confidence alone.**
+Agents produce plausible text faster than humans can check it. The gate is not
+"who did the work" (nearly everything is AI-assisted) but *how knowledge is
+accepted*: canonical entries arrive as reviewable diffs, and a human performs the
+acceptance. Concretely: agents open PRs and never merge them — **merging is the
+human acceptance act** (§5). Auto-merge is acceptable only where the acceptance
+criterion is machine-checkable (dependency bumps on green CI), which canonical
+knowledge never is.
 
 **P3 — Second-use rule.**
-Add structure only after the need has been felt twice. v0.1 is a skeleton, not a
-system. The rule defers structure we are unsure about; it does not forbid structure
-whose need is already certain (e.g. detailed per-paper literature notes, §3). It
-applies to skills too: ship few, high-signal ones. Recent empirical work finds that
-bloated or auto-generated instruction files measurably *degrade* agent performance,
-so sparseness is a correctness property, not just tidiness.
+Add structure only after the need is felt twice. It applies to files (DECISIONS
+was cut, then revived when a real category emerged), directories (no `writeups/`
+until notes/ clutters), subdirectories (`.stemma/` stays flat), branches (no dev
+branch — the zone/export model already separates tooling from releases), and
+skills (ship few; bloated instruction files measurably degrade agents). Contracts
+state bars; prompts state formats; neither demands content whose value varies by
+entry ("rationale where it isn't obvious", not mandatory fields). Going
+lean→structured later is cheap; walking back unfilled structure is not.
 
 ## 3. Structure
 
 Three zones, distinguished by what crosses the export boundary.
 
-- **Release** — ships with the paper. On publication these files are copied into a
-  fresh public repository.
-- **Research** — private; the scientific and exploratory core. Never enters public
-  history.
-- **Operations** — runs the repository: project overview, agent instructions, and the
-  `.stemma/` framework layer. Not exported.
-
 ```text
-Release
+Release                              # ships with the paper
   README.md
-  src/project_name/          # real default name; init renames it
+  src/project_name/                  # real default name; init renames it
   tests/
   data/
   reproduce/
-  manuscript/
-
+  manuscript/                        # self-contained TeX root (Overleaf/arXiv)
   pyproject.toml
   .pre-commit-config.yaml
   .github/workflows/ci.yml
   .gitignore
-  (CITATION.cff)
-  (LICENSE)
+  (CITATION.cff)  (LICENSE)          # added before public release
 
-Research
+Research                             # private; never exported
   PROJECT.md
   research/
-  ├── STATE.md
-  ├── FINDINGS.md
-  ├── QUESTIONS.md
-  ├── SURVEY.md
-  ├── investigations/
-  │   └── _template/         # question.md, log.md, README.md, review.md
-  ├── literature/            # per-paper notes, keyed by cite key
-  ├── meetings/
-  ├── notes/
-  └── workbench/
+  ├── README.md                      # zone meta-doc
+  ├── STATUS.md                      # coordination snapshot
+  ├── FINDINGS.md                    # canonical scientific knowledge
+  ├── DECISIONS.md                   # project-level choices + rationale
+  ├── QUESTIONS.md                   # open unknowns; Resolved routing index
+  ├── SURVEY.md                      # literature synthesis
+  ├── investigations/  (_template/)  # bounded, branch-per, closed by PR
+  ├── literature/      (_template.md)# per-source notes by citekey
+  ├── meetings/        (_template.md)
+  ├── notes/                         # logbook, writeups, working notes
+  └── workbench/                     # scratch; promotable via writeup
 
-Operations
-  AGENTS.md                  # router: project map + always-apply rules + pointers
-  CLAUDE.md                  # points to AGENTS.md (@AGENTS.md import; plain file)
-  init.sh                    # root: run-once instantiation entry point
-  .stemma/                   # the framework layer (see §5)
+Operations                           # runs the repo; not exported
+  AGENTS.md                          # router (root: tool-discovered)
+  CLAUDE.md                          # @AGENTS.md import (plain file)
+  .agents/skills/                    # portable skills (root: tool-discovered)
+  .claude/                           # vendor remainder
+  init.sh                            # run-once entry point (root: visible)
+  .stemma/                           # framework layer (§6)
 ```
 
-Parenthesised entries are added before public release, not at project start.
+**Placement rule:** if an external tool must *discover* it by scanning
+conventional paths, it lives at root (`AGENTS.md`, skills, `.claude/`); if only
+our own code invokes it by explicit path, it lives in `.stemma/`.
 
-**The `research/` file set.** Sort by rhythm: *now / known / unknown*.
-`STATE.md` is the current snapshot (now + next) and carries most of the weight for
-v0.1. `FINDINGS.md` accumulates established results and dead ends. `QUESTIONS.md`
-holds open questions — scientific or technical — that are not yet sharp enough to
-become investigations; the moment a question has a recognisable answer it is a task
-(`STATE.md`) or a charter, not a question. `SURVEY.md` is the standing overview of
-the literature. `PROJECT.md` — the write-once motivation and context, including the
-prior work the project builds on — sits at the zone root. `DECISIONS.md` and
-`GLOSSARY.md` are cut for v0.1 (second-use rule).
+## 4. Project memory: the epistemic hierarchy
 
-**Literature.** Three separable jobs, three homes, joined by cite key:
-citation *metadata* is `manuscript/references.bib` (a generated artifact — canonical
-maintenance happens in a reference manager such as Zotero, which exports the `.bib`;
-it is committed so the export compiles standalone, and never hand-edited); the
-*library* itself (PDFs, metadata) lives in the reference manager, outside git — PDFs
-are never committed (binary, large, mostly copyrighted, and the large-file hook
-should block them); *notes* live in `research/`, with `SURVEY.md` as the narrative
-and `literature/<citekey>.md` as substantial per-paper notes (theorems, proofs,
-methods, results). Per-paper notes separate transcription (what the paper states,
-verifiable) from project inference (what we conclude for our problem, revisable and
-gate-worthy).
+The research files are organised by *evidential status*, which tells a reader
+(especially an agent) what to trust:
 
-**Agent access to knowledge** follows a hierarchy, cheapest first: project knowledge
-(`FINDINGS.md`, investigation READMEs, `STATE.md`) → distilled paper knowledge
-(`literature/*.md`) → source PDFs (retrieved on demand via a reference-manager
-integration, with findings written back into the note).
+- **Canonical** — `FINDINGS.md` (what the project is prepared to rely on) and
+  `DECISIONS.md` (what it chose to do, and why). FINDINGS records truths;
+  DECISIONS records choices; each contract states the boundary from its side.
+- **Provenance** — the evidence canonical entries cite: a closed investigation,
+  a writeup in `notes/`, a legible `workbench/` directory, or a citation key for
+  verified external results. Provenance is heterogeneous by design; the FINDINGS
+  entry's link says which kind.
+- **Coordination** — `STATUS.md`: tasks, queue, active investigations. A rough
+  snapshot, not evidence; rewritten, never appended. Active-investigation lines
+  are touched only at charter and close (write-once-per-investigation), so
+  branches never contend over it.
+- **Identified unknowns** — `QUESTIONS.md`: research-significant open questions,
+  phrased so an answer could be recognised. Questions resolve however the answer
+  arrives (investigation, promoted work, a decision, the literature); the
+  Resolved section is a routing index that points at the *most canonical record*
+  of the answer — never at raw provenance or PR numbers — and preserves original
+  phrasing so old uncertainties are not re-opened.
+- **Raw** — `notes/`, `workbench/`, `meetings/`, investigation logs.
+  Direct-commit, no ceremony; capture must stay friction-free.
 
-## 4. Working assumptions (adopted for now, revisable after the pilot)
+**Knowledge flows upward, and the promotion path is explicit.** Rough work
+(workbench, chat conclusions, collaborator results) becomes canonical via a
+*writeup*: a self-contained note (claim, support, scope, caveats, pointers to raw
+work) that an agent can draft (`write-up` skill) and that travels in a promotion
+PR together with the FINDINGS entry citing it. Merging that PR is the acceptance
+(P2). Conclusions with no repo evidence are staged as notes, not filed as
+findings. SURVEY holds what the field established; FINDINGS holds what this
+project established (including "we verified imported result X in our regime").
 
-- **What needs a PR is defined by consequence and actor, not by zone.** The gate has
-  two tiers:
-  - *Mechanically enforceable (path-based):* changes to `src/` and `tests/` require a
-    PR, for anyone. Enforceable via branch protection (an instantiation-checklist
-    step, not a shipped file).
-  - *Convention (actor-based, in `AGENTS.md`):* agents never commit to `src/`/`tests/`
-    directly; agent edits to `manuscript/` arrive as PRs while human drafting is
-    direct; investigations close with one PR; new conclusions reach `FINDINGS.md` only
-    through an investigation's closing PR. Git cannot distinguish agent from human, so
-    these are conventions the agent follows, not mechanical rules — good enough,
-    because the agent is both the party of concern and the party that reads
-    `AGENTS.md`, and the unguarded failure (a human committing directly) is the safe
-    one.
-  - *Direct commit, no PR:* everything else — `notes/`, `workbench/`, `STATE.md`,
-    `QUESTIONS.md`, `SURVEY.md`, `literature/`, `meetings/`, and human manuscript
-    drafting.
-- **Investigations are bounded by construction.** The charter test: could you
-  recognize an answer if you saw one? If not, it belongs in `QUESTIONS.md`. A
-  long-running inquiry is a *thread* — a sequence of bounded investigations linked by
-  `superseded-by`. `workbench/` is the pre-charter escape valve.
-- **One branch per investigation; one PR at its conclusion.** The charter
-  (`question.md` + stub `README.md`) is committed directly to main at birth, so main
-  always knows the investigation exists and which branch holds it (`STATE.md` lists
-  in-flight investigations with their branches). The branch touches only its own
-  directory; cross-cutting edits go to main via the housekeeping lane. The closing PR
-  is the verification gate (P2): `review.md` is written in preparing it.
-- **Export is a fail-closed allowlist.** Release is enumerated; everything else is
-  private by *not being listed*. A new file defaults to private, so forgetting fails
-  safe. `export.sh` copies the Release allowlist into a fresh directory, `git init`s a
-  single clean commit, verifies nothing in the copy depends on anything outside it,
-  and then stops — it does not push. Publishing is a deliberate manual step.
-- **Nothing in Release may depend on anything outside it.** Not just `reproduce/`: no
-  Release file may import from or depend on `research/` or any non-exported path, or
-  export breaks silently. This is the one invariant whose violation is invisible
-  (works locally, breaks only after export), so it is worth a mechanical check
-  (§5, `check_zones.py`).
-- **Manuscript policy is phase-dependent.** Humans commit directly while drafting;
-  agent edits arrive as PRs; everything tightens near submission.
-- **Linting scope follows the code, not the repo.** Ruff (code linting) is scoped to
-  `src/`/`tests/`; hygiene hooks (whitespace, secret detection, merge-conflict) run
-  repo-wide, including `research/` — the ungated housekeeping lane has no human
-  backstop, so it needs the machine hygiene most. Content-rewriting formatters
-  (`pyproject-fmt`) are *not* run on template files: they mangle placeholders and
-  re-add deliberately-omitted metadata; safe only after instantiation.
-- Conventions worth having from day one: one-sentence-per-line LaTeX; environments
-  from `pyproject.toml` alone (plain `pip`, no `requirements.txt`); figures generated
-  only by scripts in `reproduce/`.
+**House style for memory files:** a `>` blockquote carries each file's *editing
+contract* (visible to humans, distinct from content); HTML comments carry
+per-section prompts (invisible when rendered, greppable); no placeholder body
+text; ISO dates. The blockquote convention is strict — editing contracts only —
+so Release READMEs (which are shipped project documentation, not contracts) use
+plain prose.
 
-## 5. Framework layer: `.stemma/`
+## 5. Working assumptions (adopted for now, revisable after the pilot)
 
-Stemma is a **framework the project sits inside**, not merely a scaffold it outgrows.
-The instantiated project keeps a live `.stemma/` layer that it uses throughout its
-life and can update from upstream (copier-style). This is the reason `.stemma/` is a
-dotfile directory: it signals *managed framework machinery, not project content, do
-not hand-edit*.
+- **PRs, two tiers.** *Mechanical (path-based, branch protection):* `src/`,
+  `tests/` require a PR for anyone. *Convention (actor-based, in `AGENTS.md`):*
+  agents never commit those directly; agent edits to `manuscript/` are PRs while
+  human drafting is direct; investigations close with one PR; findings entered by
+  agent hands arrive by PR even when a human asked. **Agents open PRs; humans
+  merge them.** Everything else — notes, workbench, STATUS/QUESTIONS/SURVEY
+  housekeeping, DECISIONS entries (recording a decision is making it; the commit
+  witnesses it), literature, meetings — is direct commit.
+- **Investigations are bounded by construction** (charter test: could you
+  recognise an answer?), branch-per-investigation, charter committed to main at
+  birth, one closing PR as the gate. Investigations mark *work, not intentions*:
+  they are chartered when verification work actually begins, never auto-created
+  from conversations — an investigations/ directory of husks would debase the
+  provenance the hierarchy depends on.
+- **Export is a fail-closed allowlist**; nothing in Release may depend on
+  anything not exported (the one silently-violated invariant; mechanically
+  checked by `check_zones.py`). Manuscript is a self-contained TeX root: figures
+  are generated by `reproduce/` and committed to `manuscript/figures/` so it
+  compiles alone (Overleaf, arXiv submission).
+- **Release READMEs** are templates: fixed conventions plus HTML-comment prompts,
+  written author-facing but reproducer-safe (the export audience vetoes
+  framework vocabulary), finalised at export. Soft on preferences (script
+  granularity), firm on invariants (figure destination, no non-exported imports).
+- **Linting follows the code:** ruff scoped to `src/`/`tests/`; hygiene hooks
+  (whitespace, keys, merge-conflict) repo-wide — the ungated housekeeping lane
+  has no human backstop, so it needs machine hygiene most. Content-rewriting
+  formatters (pyproject-fmt) never run on template files (they mangle
+  placeholders); commented in config with a do-not-enable-until-instantiated
+  warning.
+- Conventions from day one: one-sentence-per-line LaTeX; environments from
+  `pyproject.toml` alone; figures only from `reproduce/`.
+
+## 6. Framework layer: `.stemma/`
+
+Stemma is a framework the project keeps and updates (copier-style), not a
+scaffold it deletes. `.stemma/` is a dotdir to signal *managed machinery — run
+it, don't hand-edit it*. Agents run its scripts when asked (export, checks) but
+do not modify its internals in an instantiated project.
 
 ```text
 .stemma/
-  README.md          # what Stemma is and what this layer holds (framework's own readme)
-  export.sh          # copy Release -> fresh repo; verify; stop before pushing
-  check_zones.py     # Release must not depend on Research (mechanical, §4)
-  skills/            # portable SKILL.md procedures (the agent procedure layer)
-  (docs, further tools added on second use — flat until the count warrants subdirs)
-  tests/             # tests of the framework tooling — TEMPLATE-REPO-ONLY (§8)
+  README.md            # the framework's own readme (what this layer is)
+  export.sh            # Release → fresh repo; verify; stop before pushing
+  check_zones.py       # Release must not depend on non-exported paths
+  templates/           # instantiation templates, rendered once at init:
+    README.md          #   → root README.md (project/companion README)
+    CITATION.cff       #   structured fill-in metadata
+  tests/               # framework tests — TEMPLATE-REPO-ONLY (§8)
 ```
 
-Scripts sit directly under `.stemma/` (flat) until the count warrants subdirectories.
+Flat until the script count warrants subdirectories. **Template taxonomy:**
+*instantiation templates* (rendered once) live in `.stemma/templates/`; *runtime
+templates* (copied repeatedly: investigation `_template/`, literature and meeting
+`_template.md`) live in place in `research/`, editable as the project's
+methodology evolves; *singleton stubs* (the memory files) ship as the files
+themselves, structure and prompts baked in. LICENSE is none of these — a
+canonical legal text `init.sh` selects and stamps (copyright line only), never a
+hand-maintained skeleton (legal-text drift is not "close enough").
 
-**Three tiers of agent instruction, portable-first:**
-- **`AGENTS.md` — the router.** Short and high-signal: what the project is, the
-  project map, and the always-apply rules (the PR tiers, the export-allowlist
-  invariant, "nothing in Release depends on anything outside it", "conclusions reach
-  `FINDINGS.md` only through a closing PR"). It points to skills rather than
-  containing procedures. Kept sparse: everything here loads every session.
-  `CLAUDE.md` is a one-line `@AGENTS.md` import (a plain file, not a symlink).
-- **`.stemma/skills/*/SKILL.md` — the procedures.** Portable (read across tools) and
-  progressively disclosed (only names/descriptions load at startup; the body loads on
-  match). Where workflow logic lives — starting an investigation, the meeting routine,
-  verifying a finding.
-- **`.claude/` — the vendor remainder** (if present). Only genuinely Claude-specific
-  automation: slash-command ergonomics, subagent definitions. Orchestration is not
-  portable across tools; only the *guarantees* it must deliver belong in the portable
-  layer.
+**Agent instruction, three tiers:** `AGENTS.md` the sparse router (map,
+always-apply rules, precedence over local READMEs, pointer to `.stemma/`
+scripts); skills the procedures (v0.1: `new-investigation`, plus `write-up` for
+the promotion path — both artifact-producing, hence world-state-testable);
+`.claude/` the vendor remainder. Facts sort by scope: everywhere → AGENTS.md;
+named-task procedure → skill; this-directory-only → its README; and each
+memory file's own contract governs itself.
 
-**v0.1 skills.** Ship one — `new-investigation`. Candidates added on second use: a
-meeting routine, a self-review checklist. **Skills are a dependency surface**: audits
-in 2026 found a substantial fraction of community skills carried prompt-injection or
-other issues, and skills can bundle executable scripts. Treat third-party skills like
-code dependencies; first-party ones are in-scope for normal review.
+## 7. Testing
 
-**`check_zones.py`** enforces the Release-does-not-depend-on-Research invariant. v0.1:
-scan Release-zone Python for imports resolving into non-Release paths; run as a
-`local` pre-commit hook scoped to `^(src|tests|reproduce|manuscript)/.*\.py$`. The
-definitive version is the export-and-verify test (§6): export, then install and test
-in a sandbox with `research/` absent — if Release depended on it, the sandbox fails.
+- **Project code** — `ci.yml` (travels): install `.[dev]` across 3.12/3.13/3.14,
+  pytest, plus `pre-commit run --all-files` as the unbypassable enforcement copy
+  of the hooks. The template ships a working `project_name` package and smoke
+  test, so this CI passes on the template repo itself.
+- **Framework tooling** — tested in the Stemma repo's own CI (`stemma.yml`,
+  path-filtered to `.stemma/**` — path-filtering's first legitimate use), tests
+  in `.stemma/tests/`, template-repo-only. Highest value: instantiation test
+  (init in a sandbox; assert a valid project, no surviving placeholders) and
+  export-safety test (plant secrets in research/; assert only Release ships and
+  the export installs/tests green with research/ absent). Shell → bats. Deferred
+  until the scripts have real logic; scripts should take args (not only
+  interactive prompts) so tests can drive them.
+- **Agent behaviour** — not cheaply CI-able; test the *world-state a workflow
+  must leave* (was the writeup written? does STATUS list the investigation? did
+  the closing PR touch only its directory?). P1's payoff: output-is-a-diff means
+  the fixture is free.
 
-## 6. Testing
+## 8. Instantiation
 
-Two distinct testing concerns, with different homes:
+The template ships as a working package `project_name` (import) /
+`project-name` (distribution) so it builds pre-instantiation. `init.sh` (root,
+run-once; v0.1 may just print the checklist) renames both forms — different
+strings, separate substitutions — across `pyproject.toml`, `src/`, and the smoke
+test; fills metadata; renders `.stemma/templates/` (project README → root,
+replacing the template's own README, which never travels); writes the stamped
+LICENSE; installs pre-commit; then greps for surviving
+`project_name`/`project-name`/`{{...}}` and warns — CI cannot catch a
+wrong-but-consistent rename. Checklist includes enabling branch protection on
+`src/`/`tests/`.
 
-- **Project code** (`src/`, `tests/`) — the instantiated project's own CI
-  (`.github/workflows/ci.yml`): `pip install -e ".[dev]"`, `pytest` across a Python
-  matrix, plus `pre-commit run --all-files` (the enforcement copy of the hooks, which
-  cannot be bypassed with `--no-verify`). The template ships a real `project_name`
-  package and a smoke test, so this CI passes on the template repo itself.
-- **Framework tooling** (`.stemma/export.sh`, `check_zones.py`) — tested in the
-  **Stemma template repository's own CI**, not in instantiated projects. The tests
-  live in `.stemma/tests/` and are template-repo-only (§8). The two highest-value
-  tests: an *instantiation test* (run `init` in a sandbox, assert a valid project with
-  no surviving placeholders) and an *export-safety test* (plant secrets in `research/`,
-  run `export.sh`, assert only Release ships and nothing leaks). Shell → `bats`.
+## 9. Template-only vs travelling
 
-Testing agent *behaviour* is not cheaply CI-able; the tractable substitute is checking
-the *world-state a workflow must leave behind* (did `review.md` get written before the
-PR? does `STATE.md` list the investigation? did the closing PR touch only its own
-directory?) — deterministic assertions about the repo, no LLM-judge required. This is
-the payoff of P1: the workflow's output is a diff, so it is a fixture.
+One rule: **does a researcher *using* the framework need it, or only someone
+*developing* it?** Travels: `.stemma/` tools, templates, docs, its README; all
+zone content and stubs. Template-repo-only: `DESIGN.md`, the template's root
+README, `.stemma/tests/`. The tools travel; the tools' tests do not.
 
-## 7. Instantiation
+## 10. Open questions (for the pilot)
 
-Because `.stemma/` is a live framework layer and files must be rendered (placeholders
-filled) or omitted (template-only), instantiation is naturally a copier-style
-operation rather than a hand-rolled script; `init.sh` may implement this directly for
-v0.1 and migrate to copier as the shape stabilises. Files fall into three buckets:
+- Does the promotion path get used, or routed around (FINDINGS entries appearing
+  without writeups)? Does the humans-merge rule hold?
+- Does DECISIONS fill, or was its revival premature? Does QUESTIONS' Resolved
+  section fill (working) or stay empty while Open grows (graveyard → fold into
+  STATUS)?
+- Does STATUS's Summary (which now carries the "why" for the task list) stay
+  current, or does the inline-why-per-task pattern prove more self-maintaining?
+- Skills across surfaces; progressive disclosure; whether `write-up` and
+  `new-investigation` suffice or a meeting routine earns its place.
+- Framework model: do projects actually `copier update`, or drift?
+- Literature wiring (reference manager/MCP); grep-level vs AST-level zone check;
+  lockfiles (uv); Issues vs STATUS for tasks; data at scale (DVC/Zenodo);
+  non-coder entry points.
+- Exact skills scan path (`.agents/skills/` vs `.claude/skills/`) — verify
+  against current Agent Skills docs at scaffold time.
 
-- **Template-only (never travels):** `DESIGN.md`, the template's own root `README.md`,
-  `.stemma/tests/`. Development artifacts; copier omits them.
-- **Travels as-is (framework machinery):** `.stemma/` tools, skills, docs, and its own
-  `README.md`.
-- **Rendered from template (project content):** root `README.md` (from a project-README
-  skeleton, name/description filled), `pyproject.toml` (placeholders filled),
-  `PROJECT.md`, and `src/project_name/` renamed to the project's package.
+## 11. v0.1 scope
 
-The template ships as a working package named `project_name` (import) / `project-name`
-(distribution) so it builds and its CI passes before instantiation. Instantiation
-renames both forms (they are different strings — replace each) across `pyproject.toml`,
-the `src/` directory, and the smoke-test import, fills the metadata, swaps the README,
-and afterwards greps for any surviving `project_name` / `project-name` / `{{...}}` and
-warns (CI will not catch a wrong-but-consistent rename). The instantiation checklist
-also notes enabling branch protection on `src/`/`tests/`.
-
-## 8. Template-only vs travelling artifacts
-
-The single rule: **does a researcher *using* the framework need this, or only someone
-*developing* it?** Usage docs and tooling travel (in `.stemma/`); development artifacts
-(`DESIGN.md`, `.stemma/tests/`, the template README) stay in the Stemma repo. The
-tools travel; the tools' tests do not.
-
-## 9. Open questions (to be answered by the pilot, not by this document)
-
-- Verification mechanics: the closing PR is the gate; open whether finer statuses or a
-  reviewer subagent earn their keep.
-- Project memory: whether `QUESTIONS.md` earns its place (do questions graduate out of
-  it?), and whether a decisions log is needed once challenges route to `FINDINGS.md`.
-- Skills in practice: does the investigation procedure work as a portable skill across
-  surfaces, or does load-bearing procedure end up trapped in `.claude/`? Does
-  progressive disclosure actually fire?
-- Framework vs scaffold: does the live-`.stemma/` + `copier update` model hold up, or
-  do projects drift from upstream and stop updating?
-- Literature pipeline: reference-manager/MCP wiring, citation-verification tooling.
-  Observables: drift between `references.bib` and the notes; how often an agent needs a
-  raw PDF.
-- Task tracking: does "next" in `STATE.md` suffice, or do GitHub Issues get used?
-- Data at scale: when to introduce DVC/LFS/Zenodo; the large-file threshold.
-- Environments: does plain pip + `pyproject.toml` suffice, or is a lockfile (`uv`)
-  eventually needed?
-- CI: how much, how path-filtered. Path-filtering finds its first legitimate use in the
-  framework-CI (run only when `.stemma/**` changes); project CI stays unfiltered.
-- Non-coder entry points: which surface (Cowork, Slack, web) gets used, and whether an
-  investigation started there reaches the same end state as one run through Claude Code.
-- Zone-check depth: does the grep-level `check_zones.py` suffice, or is AST-level
-  import analysis (`import-linter`) needed?
-- What's missing entirely — the pilot's job is to surface this.
-
-## 10. v0.1 scope
-
-Scaffold only: the tree above with stub files that establish each convention (a seeded
-`STATE.md`, the investigation template, a sparse `AGENTS.md` router, the one
-`new-investigation` skill, `check_zones.py`), pre-commit basics, and a minimal CI
-workflow that installs the real `project_name` package and runs the smoke test. No
-release-script logic beyond copying the allowlist; no framework tests yet (they need
-real `export.sh`/`init` logic — post-pilot).
-
-**Pilot plan:** copy the template into an existing project's repo, run one real bounded
-investigation through the `new-investigation` skill, and log what worked, what fought
-back, and what was missing. Findings return here as issues; v0.2 follows the evidence.
-Non-coder surfaces are out of scope for pilot one. The pilot also tracks whether
-`log.md` actually gets written every session; P1's write-back rule has no other teeth.
+The tree above with its stubs (five memory files in house style, investigation
+`_template/`, literature/meeting templates, Release READMEs, manuscript skeleton
+compiling green), pre-commit + CI green on the shipped package, a sparse
+`AGENTS.md`, two skills (`new-investigation`, `write-up`), `check_zones.py` at
+grep level, and stub `export.sh`/`init.sh` carrying their spec in comments. No
+framework tests yet. **Pilot:** run one real bounded investigation and one real
+workbench→FINDINGS promotion through the skills; log what fought back; findings
+return here as issues; v0.2 follows the evidence.
 
 ---
 
-*Changes from the prior draft:* introduced the **`.stemma/` framework layer** and the
-framework-vs-scaffold decision (Stemma is a live layer the project keeps and updates,
-not a scaffold deleted at instantiation) — scripts and skills moved under `.stemma/`
-(flat), the Operations zone reorganised around it. Added the **two-tier PR model**
-(mechanical path-based for `src`/`tests`; convention actor-based in `AGENTS.md`),
-replacing the earlier lane-by-zone framing. Added the **testing section** (project CI
-vs framework CI, world-state assertions for agent workflows) and the **template-only
-vs travelling** rule (§8), with `DESIGN.md`, the template README, and `.stemma/tests/`
-as template-repo-only. Recorded the **linting scope** (ruff on Release, hygiene
-repo-wide) and the **pyproject-fmt hazard** on template files. Noted the shipped
-`project_name`/`project-name` package and the copier-style instantiation the framework
-model implies. `init.sh` stays at root (run-once entry point); `DESIGN.md` no longer
-claims to be deleted by it — it simply never travels.
+*Changes from the prior draft:* renamed STATE→**STATUS** and revived
+**DECISIONS**; recast the memory files as an **epistemic hierarchy**
+(canonical / provenance / coordination / unknowns / raw) replacing the
+now/known/unknown rhythm framing; added the **promotion path** (workbench →
+writeup → promotion PR) and sharpened P2 into "**agents open PRs; humans
+merge**" — acceptance is the merge act, uniform across actors; QUESTIONS'
+Resolved became a **layered routing index** (points at canonical records, never
+raw provenance); FINDINGS provenance made **heterogeneous by design**; no
+`findings/`/`writeups/` directory (second-use; writeups are notes); added the
+**house style** (blockquote = editing contract, strictly), the **template
+taxonomy** (instantiation vs runtime vs singleton; LICENSE excluded), and the
+no-dev-branch decision; corrected the placement rule (agent-discovered files at
+root, only invoked-by-path machinery in `.stemma/`).
