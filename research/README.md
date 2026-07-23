@@ -1,1 +1,1 @@
-# Research — Stemma
+# Research – Stemma
