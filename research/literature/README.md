@@ -16,8 +16,6 @@ as required.
 ```markdown
 # <!-- Title -->
 
-**Authors:** <!-- List of authors (within reason). -->
-
 **Reference:** <!-- Authors, venue, year. DOI or stable link. -->
 
 ## Summary
