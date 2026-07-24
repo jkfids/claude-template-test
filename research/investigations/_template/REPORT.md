@@ -1,11 +1,10 @@
 # Report
 
-> Final concise account. This document
-> should stand on its own as a short scientific report, and is designed to be
-> the primary investigation artifact to be shared with collaborators. No new
-> science: every claim must be supported by `ANALYSIS.md` or the artifacts it
-> cites. Completed when preparing the closing PR; merging means acceptance.
-> Later changes arrive by pull request.
+> Final concise account. This document should stand on its own as a short
+> scientific report, and is designed to be the primary investigation artifact
+> to be shared with collaborators. No new science: every claim must be supported
+> by `ANALYSIS.md` or the artifacts it cites. Completed when preparing the
+> closing PR; merging means acceptance. Later changes arrive by pull request.
 
 **Date:** <!-- YYYY-MM-DD -->
 

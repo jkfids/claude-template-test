@@ -14,7 +14,7 @@
 
 <!-- Explain the scientific or practical problem and why it matters. Identify
      the limitation, gap, or opportunity that motivates the project—in a few
-     sentences.-->
+     sentences. -->
 
 ## People
 

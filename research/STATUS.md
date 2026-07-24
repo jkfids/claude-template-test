@@ -17,8 +17,3 @@
 ## Next
 
 <!-- Bullet list of queued tasks, in rough order. -->
-
-## Active investigations
-
-<!-- Directory names of active investigations. Added at charter, removed by the
-     closing PR; details belong in the investigation directory. -->
