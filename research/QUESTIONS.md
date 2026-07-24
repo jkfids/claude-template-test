@@ -1,7 +1,7 @@
 # Questions
 
 > Unresolved questions of research significance—scientific, mathematical,
-> methodological, computational, or technical. Phrase each question so an
+> methodological, computational, or technical. Phrase each question, so an
 > answer could be recognized; questions resolve however the answer arrives.
 > Concrete tasks and routine bugs belong in `STATUS.md` or issues.
 
