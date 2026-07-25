@@ -33,13 +33,22 @@ directory, and fill in its `README.md`: the question, its scope, and what
 would conclude it.
 
 ```bash
-slug="<short-title>"
+# In project root.
+slug="<short-title>"  # Replace.
 git switch main
 git switch -c "investigation/${slug}"
-cp -R research/investigations/_template "research/investigations/${slug}"
-# Fill in the `research/investigations/${slug}/README.md`.
+mkdir "research/investigations/${slug}"
+cp -R research/investigations/_template/. "research/investigations/${slug}/"
+```
+
+Fill in `research/investigations/${slug}/README.md`, then commit and push
+the investigation branch.
+```bash
+# Make sure to re-set slug if this is a new shell session:
+# slug="<short-title>"
 git add "research/investigations/${slug}"
 git commit -m "Charter investigation: ${slug}"
+git push -u origin "investigation/${slug}"  # Visibility to collaborators.
 ```
 
 ### 2. Work

@@ -11,4 +11,4 @@
 ## Results
 
 <!-- - Finding, stated precisely. Scope or conditions. Provenance:
-       `investigations/<slug>/`, `notes/<slug>`, or citekey. -->
+       `investigations/<slug>/REPORT.md`, `notes/<slug>`, or citekey. -->

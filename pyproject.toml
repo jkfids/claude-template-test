@@ -37,7 +37,7 @@ dependencies = []
 # pip install -e ".[dev]"
 dev = ["pytest>=8", "ruff>=0.6"]
 
-[project.urls]
+# [project.urls]
 # Source = "https://github.com/user/project-name"
 
 [tool.hatch.build.targets.wheel]

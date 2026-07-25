@@ -1,7 +1,7 @@
 # Investigation: <!-- Investigation title -->
 
 > Control center for one bounded investigation. Keep this file concise and up
-> to date. Revise as understanding improved. If the question itself changes
+> to date. Revise as understanding improves. If the question itself changes
 > materially, close this investigation and start a new one. Detailed methods,
 > evidence, and reproduction belong in `ANALYSIS.md`. The final, reviewed
 > account lives in `REPORT.md`.

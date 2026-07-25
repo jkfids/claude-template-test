@@ -8,7 +8,7 @@
 > **Status:** Very WIP; conventions are still settling.
 
 A monorepository template for AI-assisted academic research, supporting the
-full project lifecycle—literature, proofs, numerics, reproducible results, and
+full project lifecycle—literature, theory, numerics, reproducible results, and
 manuscript writing. Stemma is built around reusable agent workflows, emphasizing
 rigorous verification and flexible collaboration. It is designed to fit within a
 wider software stack, including AI tools, reference managers, and communication
