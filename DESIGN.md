@@ -277,12 +277,22 @@ They exist where a directory needs orienting — `data/`, `reproduce/` — not b
 default: `manuscript/` ships source (`main.tex`, `references.bib`, `figures/`)
 and no README, since LaTeX source explains itself to its reader and the export
 would only delete it.
-- **Linting follows the code:** ruff scoped to `src/`/`tests/`; hygiene hooks
-(whitespace, keys, merge-conflict) repo-wide — the ungated housekeeping lane
-has no human backstop, so it needs machine hygiene most. Content-rewriting
-formatters (pyproject-fmt) never run on template files (they mangle
-placeholders); commented in config with a do-not-enable-until-instantiated
-warning.
+- **Linting follows the code, as an allow-list.** Ruff runs on `src/` and
+`tests/` only; a new directory of Python is never linted until deliberately
+added. This needs both halves — `include` in `pyproject.toml` (governs
+`ruff check .` and editors) and `files:` on the pre-commit hooks (governs the
+commit path): `include` does not constrain paths passed explicitly, and
+pre-commit always passes them explicitly. The rule set favours correctness
+over style, since the formatter owns layout: `E4/E7/E9` rather than all of
+`E`, and `E501` omitted because it cannot be autofixed for comments, URLs, or
+strings. Safety hygiene (large files, private keys, merge conflicts, TOML
+validity) stays repo-wide — the ungated research lane has no human backstop,
+so it needs machine hygiene most — while *cosmetic* hygiene is the friction P4
+warns about and is scoped away from `research/` before release. Line endings
+are normalised by `.gitattributes` (`* text=auto eol=lf`), not by a
+commit-time hook. Content-rewriting formatters (pyproject-fmt) never run on
+template files (they mangle placeholders); commented in config with a
+do-not-enable-until-instantiated warning.
 - Conventions from day one: one-sentence-per-line LaTeX; environments from
 `pyproject.toml` alone; figures only from `reproduce/`; investigation reports
 and literature notes cite from the project's shared bibliography (one
@@ -344,7 +354,9 @@ its README; and each memory file's own contract governs itself.
 
 ## 7. Testing
 
-- **Project code** — `ci.yml` (travels): install `.[dev]` across 3.12/3.13/3.14,
+- **Project code** — `ci.yml` (travels): install `.[dev]` across a small Python
+matrix (floor and current — a research project runs on one interpreter; wide
+matrices are a library posture),
 pytest, plus `pre-commit run --all-files` as the unbypassable enforcement copy
 of the hooks. The template ships a working `project_name` package and smoke
 test, so this CI passes on the template repo itself.
@@ -383,12 +395,16 @@ wrong-but-consistent rename. Checklist includes enabling branch protection on
 One rule: **does a researcher *using* the framework need it, or only someone
 *developing* it?** Travels: `.stemma/` tools, templates, docs, its README; all
 zone content and stubs. Template-repo-only: `DESIGN.md`, the template's root
-README, `.stemma/tests/`. The tools travel; the tools' tests do not.
+README, `.github/assets/` (the Stemma logo — note `.github/workflows/`
+travels), `.stemma/init/` (instantiation templates, consumed at init), and
+`.stemma/tests/`. `init.sh` owns this list and deletes each path. The tools travel; the tools' tests do not.
 
 ## 10. Open questions (for the pilot)
 
-- Does the promotion path get used, or routed around (FINDINGS entries appearing
-without writeups)? Does the humans-merge rule hold?
+- v0.1 routes **everything through investigations** — `write-up` is deferred,
+so the closing PR is the only promotion path. Does that hold, or do small
+conclusions strand with nowhere to be promoted (the trigger to build `write-up`
+and the `notes/` writeup route)? Does the humans-merge rule hold?
 - **The ownership assumption:** the frictionless investigation model assumes an
 engaged researcher steering the work — that is its integrity mechanism (P4).
 If an investigation runs in low-touch mode, does the question drift without
@@ -434,26 +450,27 @@ embedded in their directory READMEs; Release READMEs for `data/` and
 `figures/` — compiling standalone), pre-commit + CI green on the shipped
 package, a sparse
 `AGENTS.md` (carrying the always-apply rules of §6), two skills
-(`new-investigation`, `write-up`), `check_zones.py` at grep level, and stub
+(`new-investigation`, `add-source`), `check_zones.py` at grep level, and stub
 `export.sh`/`init.sh` carrying their spec in comments. No framework tests yet.
 No log file, no render script, no fixed report skeleton — each deferred with a
-named trigger (§5). **Pilot:** run one real bounded investigation and one real
+named trigger (§5). **Before tagging v0.1:** implement `init.sh` against its spec, and scope the
+cosmetic hygiene hooks (`trailing-whitespace`, `end-of-file-fixer`) away from
+`research/` — deferred so the template's own files stay clean while it is the
+product. **Pilot:** run one real bounded investigation and one real
 workbench→FINDINGS promotion through the skills; log what fought back; findings
 return here as issues; v0.2 follows the evidence.
 
 ---
 
-*Changes from the prior draft:* the manuscript directory now ships **source
-rather than documentation** — `main.tex` (a replaceable default, swapped for
-the target journal's class), `references.bib` (the project's one shared
-bibliography), and `figures/` — and `manuscript/README.md` was dropped, on the
-grounds that LaTeX source explains itself and the export deletes the file
-anyway. Cross-zone invariants were reassigned under single ownership: figure
-destination to `reproduce/README.md`, shared citekey space to
-`literature/README.md`; one-sentence-per-line and TeX self-containment are
-recorded as having **no traveling owner**, a gap carried to §10 rather than
-patched. Investigation branches are now **deleted at close**, keeping the
-`investigation/*` list a registry of active rather than historical work.
-`STATUS.md`'s description was corrected to match the file (tasks only; the
-branch list, not STATUS, is the in-flight registry). "Proofs" became "theory"
-in §1, matching the README's narrowed claim.
+*Changes from the prior draft:* recorded the **linting posture** settled while
+building the config layer — ruff as an allow-list (`include` in pyproject *and*
+`files:` on the hooks, since neither alone covers both entry points), a rule
+set chosen against the formatter rather than duplicating it, safety hygiene
+repo-wide but cosmetic hygiene scoped away from `research/` before release, and
+line endings handled by `.gitattributes` rather than a commit-time hook;
+trimmed the CI matrix (a research project runs on one interpreter); added
+`.github/assets/` and `.stemma/init/` to the template-only list, which
+`init.sh` now owns and enumerates in its spec; swapped `write-up` for
+`add-source` in v0.1 skills, making **everything route through investigations**
+and rewriting the corresponding pilot question — the trigger to build `write-up`
+is small conclusions stranding with nowhere to go.
