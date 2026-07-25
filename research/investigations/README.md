@@ -43,6 +43,7 @@ cp -R research/investigations/_template/. "research/investigations/${slug}/"
 
 Fill in `research/investigations/${slug}/README.md`, then commit and push
 the investigation branch.
+
 ```bash
 # Make sure to re-set slug if this is a new shell session:
 # slug="<short-title>"
@@ -62,4 +63,4 @@ may be drafted as results stabilize, but must not lead the analysis.
 Complete `REPORT.md`, finalize the investigation `README.md`, and open the
 closing pull request—the investigation directory together with resulting
 updates to `research/`'s memory files. Keep unrelated housekeeping and
-release-facing changes out of it. Once merged, the branch may be deleted.
+release-facing changes out of it. Once merged, delete the branch.

@@ -6,7 +6,9 @@ relevance to this project. Cross-source synthesis belongs in `SURVEY.md`.
 
 ## Conventions
 
-Name each source note using its bibliography citekey, `<citekey>.md`.
+Name each source note `<citekey>.md`, after its key in the project
+bibliography, `manuscript/references.bib, which is shared across these
+notes, investigation reports, and the manuscript.
 
 ## Template
 
