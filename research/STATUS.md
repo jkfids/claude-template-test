@@ -1,8 +1,8 @@
 # Status
 
 > Current coordination state: current and queued tasks. Treat as a rough
-> snapshot—canonical understanding lives in `FINDINGS.md`. Rewrite rather
-> than append; delete anything out of date.
+> snapshot—canonical knowledge lives in `FINDINGS.md`. Rewrite rather than
+> append; delete anything out of date.
 
 **Last updated:** <!-- YYYY-MM-DD -->
 
