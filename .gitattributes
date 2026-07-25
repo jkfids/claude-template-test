@@ -1,0 +1,16 @@
+# ==============================================================================
+# .gitattributes – Stemma
+# ==============================================================================
+
+# Normalize detected text files: LF in the repository and on checkout.
+* text=auto eol=lf
+
+# Show meaningful structural context in diffs.
+*.py  diff=python
+*.md  diff=markdown
+*.tex diff=tex
+
+# Exclude research prose and manuscripts from GitHub language statistics.
+research/**/*.md  linguist-documentation
+research/**/*.tex linguist-documentation
+manuscript/**     linguist-documentation

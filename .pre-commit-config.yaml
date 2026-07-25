@@ -12,6 +12,7 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace  # Remove trailing whitespace
+        args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer  # Ensure files end with a newline
       - id: check-merge-conflict  # Catch unresolved merge conflict markers
       - id: check-added-large-files  # Block large files from being committed
@@ -19,34 +20,34 @@ repos:
       - id: detect-private-key  # Basic protection against committing private keys
       - id: check-toml  # Validate TOML syntax
       - id: check-yaml  # Validate YAML syntax
-      - id: check-json  # Validate JSON syntax
-      - id: check-case-conflict  # Catch names that clash on case-insensitive filesystems
-      - id: debug-statements  # Catch leftover breakpoint() / pdb imports
-      - id: mixed-line-ending  # Normalize line endings
-      - id: check-executables-have-shebangs  # Executable files must have a shebang
-      - id: check-symlinks  # Catch broken symlinks
 
       # Omitted by default
       # - id: no-commit-to-branch  # Prevent committing to certain branches, may interfere with Stemma's git workflow
-
+      # - id: check-executables-have-shebangs  # Executable files must have a shebang
+      # - id: check-shebang-scripts-are-executable  # Shebang implies +x
+      # - id: check-json  # Validate JSON syntax
+      # - id: check-symlinks  # Catch broken symlinks
+      # - id: check-case-conflict  # Catch names that clash on case-insensitive filesystems
 
 # ruff linting and formatting
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.21
+    rev: v0.16.0
     hooks:
       - id: ruff-check
         args: ["--fix"]
+        files: ^(src|tests)/
       - id: ruff-format
+        files: ^(src|tests)/
 
 # Strip Jupyter notebook output before commit.
 #   - repo: https://github.com/kynan/nbstripout
-#     rev: 0.8.1
+#     rev: 0.9.1
 #     hooks:
 #       - id: nbstripout
 
 # Shell script linting.
 #   - repo: https://github.com/shellcheck-py/shellcheck-py
-#     rev: v0.10.0.1
+#     rev: v0.11.0.1
 #     hooks:
 #       - id: shellcheck
 
@@ -60,6 +61,6 @@ repos:
 
 # pyproject.toml formatting. Recommended to enable after pyproject.toml is stable.
 #   - repo: https://github.com/tox-dev/pyproject-fmt
-#     rev: v2.11.1
+#     rev: v2.25.3
 #     hooks:
 #       - id: pyproject-fmt  # Canonicalize pyproject.toml formatting

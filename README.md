@@ -42,6 +42,7 @@ Release
   pyproject.toml                   # Packaging
   .pre-commit-config.yaml          # Commit checks
   .github/workflows/ci.yml         # Continuous integration
+  .gitattributes
   .gitignore
   (CITATION.cff)  (LICENSE)        # Added before public release
 
