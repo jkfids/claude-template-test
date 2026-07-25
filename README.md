@@ -16,7 +16,7 @@ platforms.
 
 ## In practice
 
-## Repository structure
+## Structure
 
 The repository is divided into three zones.
 

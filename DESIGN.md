@@ -20,10 +20,19 @@ meetings, literature, theory, numerics, reusable software, manuscript, and publi
 release — with AI-assisted work as a first-class workflow rather than an add-on,
 usable by collaborators who are not strong programmers.
 
-The design is provider-neutral. Two open standards carry the portable layer:
-`AGENTS.md` (read by most agent tools) for project instructions, and the Agent
-Skills format (`SKILL.md`) for reusable procedures. Only genuinely tool-specific
-automation lives in a vendor directory (`.claude/`).
+Stemma is the layer that holds a project's state, evidence, and acceptance
+rules — a control plane living in the repository itself. Everything around it
+is a replaceable execution choice: the model, the agent tool that gives it
+context and an action loop (Claude Code, Cursor, an IDE plugin), and the
+surface a human steers from. Stemma does not choose models, construct context,
+or run the agent loop; it defines what agents may do and what counts as
+accepted, so a project can move between clients without changing its source of
+truth.
+
+Provider neutrality follows from two open standards carrying the portable
+interface: `AGENTS.md` (read by most agent tools) for project instructions, and
+the Agent Skills format (`SKILL.md`) for reusable procedures. Only genuinely
+client-specific adapters live in a vendor directory (`.claude/`).
 
 Development loop: design the template here → instantiate it in a real project →
 run real work through it → return findings → revise.
@@ -111,13 +120,13 @@ Research                             # private; never exported
   ├── notes/                         # logbook, writeups, working notes
   └── workbench/                     # scratch; promotable via writeup
 
-Operations                           # runs the repo; not exported
-  AGENTS.md                          # router (root: tool-discovered)
-  CLAUDE.md                          # @AGENTS.md import (plain file)
-  .agents/skills/                    # portable skills (root: tool-discovered)
-  .claude/                           # vendor remainder
+Operations                           # shared control plane; not exported
+  AGENTS.md                          # portable router (root: tool-discovered)
+  CLAUDE.md                          # Claude adapter: @AGENTS.md import
+  .agents/skills/                    # portable procedures (tool-discovered)
+  .claude/                           # Claude-specific remainder
   init.sh                            # run-once entry point (root: visible)
-  .stemma/                           # framework layer (§6)
+  .stemma/                           # managed framework machinery (§6)
 ```
 
 **Placement rule:** if an external tool must *discover* it by scanning
@@ -313,10 +322,12 @@ section-by-section as the pilot shows each earns its place.
 
 ## 6. Framework layer: `.stemma/`
 
-Stemma is a framework the project keeps and updates (copier-style), not a
-scaffold it deletes. `.stemma/` is a dotdir to signal *managed machinery — run
-it, don't hand-edit it*. Agents run its scripts when asked (export, checks) but
-do not modify its internals in an instantiated project.
+Stemma is a framework the project keeps and updates (copier-style), not an
+agent runtime and not a scaffold it deletes. Agent tools consume its
+`AGENTS.md`, skills, and client adapters; `.stemma/` holds the deterministic
+machinery they invoke. The dotdir signals *managed machinery — run it, don't
+hand-edit it*: agents run its scripts when asked (export, checks) but do not
+modify its internals in an instantiated project.
 
 ```
 .stemma/
@@ -389,6 +400,12 @@ greps for surviving
 wrong-but-consistent rename. Checklist includes enabling branch protection on
 `src/`/`tests/`.
 
+Instantiation configures the research project, not a permanent AI stack. It
+does not pin a model, agent tool, or work surface: those remain user- and
+task-level choices. Client adapters may be detected or generated, but canonical
+rules stay in the portable layer and personal credentials stay outside the
+repository.
+
 ## 9. Template-only vs travelling
 
 One rule: **does a researcher *using* the framework need it, or only someone
@@ -438,8 +455,9 @@ lockfiles (uv); Issues vs STATUS for tasks; data at scale (DVC/Zenodo);
 non-coder entry points; the md→PDF render path for reports.
 - Do the LaTeX conventions (one-sentence-per-line, self-contained TeX root)
 need a traveling home, or does the manuscript's own shape teach them?
-- Exact skills scan path (`.agents/skills/` vs `.claude/skills/`) — verify
-against current Agent Skills docs at scaffold time.
+- Does the portable extension layer work across clients without duplicated
+policy? Verify discovery paths and adapter strategy at scaffold time; decide
+whether v0.1 needs one paved reference client or only compatibility checks.
 
 ## 11. v0.1 scope
 
@@ -471,19 +489,30 @@ extending this document.
 
 ---
 
-*Changes from the prior draft:* adopted the **draft PR at charter** — opened
-when the investigation is chartered, it is the registry of in-flight work, the
-place to comment mid-flight, and the same PR that closes the investigation, so
-nothing enters `main` early and there is still one merge; the branch-registry
-pilot question is retired accordingly. Sharpened the acceptance rule: entries
-to `FINDINGS.md` *or* `DECISIONS.md` made by agent hands arrive by PR, while a
-human recording a decision they have taken commits directly. Made per-source
-literature notes explicitly **selective**, and gave the never-hand-edit rule
-for the generated bibliography an owner in `AGENTS.md`. Recorded the linting
-posture settled while building the config layer (ruff as an allow-list needing
-both `include` and hook `files:`; a rule set chosen against the formatter;
-safety hygiene repo-wide, cosmetic hygiene scoped away from `research/` before
-release; line endings via `.gitattributes`), trimmed the CI matrix, corrected
-`.stemma/init/` throughout, and swapped `write-up` for `add-source` in v0.1 —
-v0.1 routes **everything through investigations**, and small conclusions
-stranding is the trigger to build the writeup route.
+*Changes from the prior draft.* **Positioning:** Stemma is stated as the
+repository-native control plane — it holds state, evidence, and acceptance
+rules, while models, agent tools, and work surfaces stay replaceable execution
+choices; it does not run agent loops, and instantiation configures the project
+rather than pinning a client (§1, §6, §8).
+
+**Workflow:** adopted the **draft PR at charter** — opened when an
+investigation is chartered, it is the registry of in-flight work, the place to
+comment mid-flight, and the same PR that closes the investigation, so nothing
+enters `main` early and there is still one merge; the branch-registry pilot
+question retires accordingly (§5, §7, §10). Sharpened the acceptance rule:
+entries to `FINDINGS.md` *or* `DECISIONS.md` made by agent hands arrive by PR,
+while a human recording a decision they have taken commits it directly (§5).
+Per-source literature notes are explicitly **selective**, and the
+never-hand-edit rule for the generated bibliography has an owner in `AGENTS.md`
+(§5, §6).
+
+**Tooling:** recorded the linting posture settled while building the config
+layer — ruff as an allow-list needing both `include` and hook `files:`, a rule
+set chosen against the formatter rather than duplicating it, safety hygiene
+repo-wide but cosmetic hygiene scoped away from `research/` before release, and
+line endings via `.gitattributes` (§5); trimmed the CI matrix (§7); corrected
+`.stemma/init/` throughout (§6, §8).
+
+**Scope:** swapped `write-up` for `add-source` in v0.1, so everything routes
+through investigations; small conclusions stranding with nowhere to go is the
+trigger to build the writeup route (§4, §10, §11).
