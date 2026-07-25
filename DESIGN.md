@@ -100,10 +100,11 @@ Research                             # private; never exported
   ├── QUESTIONS.md                   # open unknowns; Resolved routing index
   ├── SURVEY.md                      # literature synthesis
   ├── investigations/
+  │   ├── README.md                  # conventions + lifecycle
   │   ├── _template/                 # README.md, ANALYSIS.md, REPORT.md
-  │   └── <slug>/                    # bounded dossier; branch-per, closed by PR
-  ├── literature/      (_template.md)# per-source notes by citekey
-  ├── meetings/        (_template.md)
+  │   └── <short-title>/             # bounded dossier; branch-per, closed by PR
+  ├── literature/      README.md     # per-source notes by citekey; template in README
+  ├── meetings/        README.md     # one dir per meeting; template in README
   ├── notes/                         # logbook, writeups, working notes
   └── workbench/                     # scratch; promotable via writeup
 
@@ -185,12 +186,15 @@ not filed as findings. SURVEY holds what the field established; FINDINGS holds
 what this project established (including "we verified imported result X in our
 regime").
 
-**House style for memory files:** a `>` blockquote carries each file's *editing
-contract* (visible to humans, distinct from content); HTML comments carry
-per-section prompts (invisible when rendered, greppable); no placeholder body
-text; ISO dates. The blockquote convention is strict — editing contracts only —
-so Release READMEs (which are shipped project documentation, not contracts) use
-plain prose.
+**House style:** a `>` blockquote carries a file's *editing contract* (visible
+to humans, distinct from content) and marks a genuine editing regime — gates,
+rewrite-vs-append rules, close-and-recharter. HTML comments carry per-section
+prompts (invisible when rendered, greppable); no placeholder body text; ISO
+dates. Raw-tier instance templates (literature notes, meeting records) carry
+prompts only — no blockquote, since a write-once raw file has no regime to
+enforce. Documentation READMEs (Release, zone, directory) are plain prose, not
+contracts. **Single ownership:** every convention has one owning file; other
+files point at it, never paraphrase it.
 
 ## 5. Working assumptions (adopted for now, revisable after the pilot)
 
@@ -213,29 +217,39 @@ Investigations mark *work, not intentions*: they are created when substantive
 work begins, never automatically from conversations or merely because a
 question exists.
 
-  The investigation lifecycle is deliberately light — one gate, at the end:
+  The investigation lifecycle is deliberately light — one gate, at the end.
+  Nothing touches `main` until close: active investigations are simply the
+  `investigation/*` branches, and the closing PR brings the investigation to
+  `main` for the first time. (The traveling statement of these conventions is
+  `research/investigations/README.md`, which owns them; this section
+  summarizes.)
 
-  1. **Charter.** Create the branch; copy `_template/` to
-     `investigations/<slug>/`; fill the README (question, scope, answer
-     criterion). Add the investigation's line to `STATUS.md` on main (direct
-     commit; the skill may do this automatically).
+  1. **Charter.** From `main`, create the branch `investigation/<short-title>`;
+     copy `_template/` to `investigations/<short-title>/`; fill the README
+     (question, scope, answer criterion). Names are short hyphenated titles,
+     undated, unique for the life of the project.
   2. **Work.** Direct commits on the branch, no ceremony. Keep the README's
      current state up to date and steer the science in `ANALYSIS.md`;
      `REPORT.md` may be drafted as sections stabilise but never leads —
      claims appear in the analysis first. If the question itself changes,
      close and start a new investigation.
   3. **Close.** Complete `REPORT.md`; open the one closing PR, carrying the
-     full dossier together with the affected memory files (`STATUS.md` line
-     closed; `FINDINGS.md`, `DECISIONS.md`, `QUESTIONS.md`, `SURVEY.md` as
-     applicable). The PR proposes the conclusion; **the human merges, and the
-     merge is the acceptance.** After close, the dossier changes only by PR.
+     full dossier together with resulting updates to the memory files
+     (`FINDINGS.md`, `DECISIONS.md`, `QUESTIONS.md`, `SURVEY.md`,
+     `STATUS.md`, as applicable). The PR proposes the conclusion; **the human
+     merges, and the merge is the acceptance.** After close, the dossier
+     changes only by PR.
 
   A closing PR should be confined to its own investigation directory and the
   directly affected memory files — no unrelated housekeeping, no other
-  investigations, no release-facing implementation work. An investigation
-  abandoned early with nothing established simply deletes its branch; one
-  abandoned with something worth keeping closes normally, with a short report
-  recording what was established and why work stopped.
+  investigations, no release-facing implementation work. Investigation
+  branches do not modify the Release zone: a needed `src/`/`tests/` change is
+  edited and verified in place but committed on a separate branch off `main`
+  through the normal PR lane, then `main` is merged back into the
+  investigation branch. An investigation abandoned early with nothing
+  established simply deletes its branch; one abandoned with something worth
+  keeping closes normally, with a short report recording what was established
+  and why work stopped.
 
 - **Charter changes are consent-gated, not ceremony-gated.** There is no
 amendment trail, no frozen charter, and no mid-flight visibility on main —
@@ -293,19 +307,23 @@ do not modify its internals in an instantiated project.
   tests/               # framework tests — TEMPLATE-REPO-ONLY (§8)
 ```
 
-Flat until the script count warrants subdirectories. **Template taxonomy:**
-*instantiation templates* (rendered once) live in `.stemma/templates/`;
-*runtime templates* (copied repeatedly: investigation `_template/`, literature
-and meeting `_template.md`) live in place in `research/`, editable as the
-project's methodology evolves; *singleton stubs* (the memory files) ship as the
-files themselves, structure and prompts baked in. LICENSE is none of these — a
+Flat until the script count warrants subdirectories (the instantiation assets
+currently live under `.stemma/init/`). **Template taxonomy — form follows
+instance shape:** *instantiation templates* (rendered once) live under
+`.stemma/`; *runtime templates* live in place in `research/`, editable as the
+project's methodology evolves, in two forms — multi-file instances ship a
+`_template/` directory (investigations), while single-file instances embed
+their template in the directory's README (literature notes, meeting records);
+*singleton stubs* (the memory files) ship as the files themselves, structure
+and prompts baked in. LICENSE is none of these — a
 canonical legal text `init.sh` selects and stamps (copyright line only), never a
 hand-maintained skeleton (legal-text drift is not "close enough").
 
 **Agent instruction, three tiers:** `AGENTS.md` the sparse router (map,
-always-apply rules — including the charter consent rule and
-agents-open-PRs-humans-merge — precedence over local READMEs, pointer to
-`.stemma/` scripts); skills the procedures (v0.1: `new-investigation`, plus
+always-apply rules — the charter consent rule, agents-open-PRs-humans-merge,
+Release-zone changes during research work get their own PR off `main`, and
+don't read or summarize the Research zone by default — precedence over local
+READMEs, pointer to `.stemma/` scripts); skills the procedures (v0.1: `new-investigation`, plus
 `write-up` for the promotion path — both artifact-producing, hence
 world-state-testable); `.claude/` the vendor remainder. Facts sort by scope:
 everywhere → AGENTS.md; named-task procedure → skill; this-directory-only →
@@ -328,10 +346,10 @@ interactive prompts) so tests can drive them.
 - **Agent behaviour** — not cheaply CI-able; test the *world-state a workflow
 must leave*. For investigations, deterministic checks can assert that the
 dossier's README contains a recognisable question and answer criterion, that
-`STATUS.md` lists the investigation while active, that `REPORT.md` is
-non-empty in the closing PR and the README's current state points at it, and
-that the closing PR's changed paths are confined to the investigation's own
-directory plus the affected root memory files. P1's payoff is that
+the `investigation/*` branch exists while active (the branch list is the
+in-flight registry; no file tracks it), that `REPORT.md` is non-empty in the
+closing PR, and that the closing PR's changed paths are confined to the
+investigation's own directory plus the affected root memory files. P1's payoff is that
 output-is-a-diff makes these workflows testable without an LLM judge.
 
 ## 8. Instantiation
@@ -372,6 +390,9 @@ back?
 survive real closes?
 - Is the absence of a chronological log ever actually felt (session history
 with no home; analysis bloating with narrative)?
+- Does the branch-only registry suffice — is in-flight work ever lost or
+forgotten with no STATUS mandate at charter, and does anyone miss browsable
+charters on `main` mid-flight?
 - Does DECISIONS fill, or was its revival premature? Does QUESTIONS' Resolved
 section fill (working) or stay empty while Open grows (graveyard → fold into
 STATUS)?
@@ -388,12 +409,14 @@ against current Agent Skills docs at scaffold time.
 
 ## 11. v0.1 scope
 
-The tree above with its stubs (five memory files in house style, investigation
-`_template/` — `README.md`, `ANALYSIS.md`, `REPORT.md`, deliberately minimal:
-contract blockquotes plus prompts, structure otherwise free — literature/meeting
-templates, Release READMEs, manuscript skeleton compiling green), pre-commit +
-CI green on the shipped package, a sparse `AGENTS.md` (carrying the charter
-consent rule and agents-open-PRs-humans-merge), two skills
+The tree above with its stubs (five memory files plus `PROJECT.md` in house
+style; the zone README as map and gate; investigation `_template/` —
+`README.md`, `ANALYSIS.md`, `REPORT.md`, deliberately minimal: contract
+blockquotes plus prompts, structure otherwise free — with conventions and
+lifecycle in `investigations/README.md`; literature and meeting templates
+embedded in their directory READMEs; Release READMEs; manuscript skeleton
+compiling green), pre-commit + CI green on the shipped package, a sparse
+`AGENTS.md` (carrying the always-apply rules of §6), two skills
 (`new-investigation`, `write-up`), `check_zones.py` at grep level, and stub
 `export.sh`/`init.sh` carrying their spec in comments. No framework tests yet.
 No log file, no render script, no fixed report skeleton — each deferred with a
@@ -403,19 +426,20 @@ return here as issues; v0.2 follows the evidence.
 
 ---
 
-*Changes from the prior draft:* settled the investigation dossier as three
-files organised by **kind of knowledge** — `README.md` (control center),
-`ANALYSIS.md` (living technical record), `REPORT.md` (final self-contained
-account; the FINDINGS landing page and the collaborator-shareable artifact,
-under a **no-new-science** rule) — after cycling through and rejecting
-charter/log/review variants; cut `LOG.md` (git is the chronology; curated
-reinstatement form named) and all amendment/freeze machinery on the charter,
-replaced by a **consent rule** (agents propose charter changes and wait) and
-the scope-discipline line (question changes ⇒ close and start anew); moved the
-whole lifecycle to a **single closing PR** (charter happens on the branch;
-only the STATUS line touches main mid-flight); added **P4 — friction scales
-with epistemic weight; readable over auditable; researcher ownership is the
-integrity mechanism** — and recorded its assumption as a pilot question;
-templates shipped deliberately minimal, with drafted skeletons, the log, and
-the render script all **deferred with named triggers** rather than silently
-dropped.
+*Changes from the prior draft:* built out the zone's documentation layer under
+a **single-ownership rule** (every convention has one owning file; others
+point, never paraphrase): `research/README.md` is the zone map plus the one
+zone-wide statement of the acceptance gate; `investigations/README.md` owns
+investigation conventions and lifecycle; literature and meeting conventions
+live in their directory READMEs, which also **embed their templates** —
+template taxonomy generalised to *form follows instance shape* (multi-file →
+`_template/`; single-file → embedded in the directory README). House style
+sharpened: blockquotes mark genuine editing regimes only; raw-tier instance
+templates are prompts-only; documentation READMEs are plain prose. Lifecycle
+simplified further: **nothing touches `main` until close** — the
+`investigation/*` branches are the in-flight registry, the STATUS-at-charter
+mandate is dropped (STATUS may snapshot active work but is not a ledger), and
+investigation names are undated short titles, unique for the project's life.
+Added the **Release-zone boundary convention** (mid-investigation `src/`
+changes are verified in place but committed via their own PR off `main`, then
+merged back). Branch-registry discoverability recorded as a pilot question.
