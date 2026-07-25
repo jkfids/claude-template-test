@@ -45,7 +45,7 @@ Fill in `research/investigations/${slug}/README.md`, then commit and push
 the investigation branch.
 
 ```bash
-# Make sure to re-set slug if this is a new shell session:
+# Make sure to re-set slug if the previous shell session was closed:
 # slug="<short-title>"
 git add "research/investigations/${slug}"
 git commit -m "Charter investigation: ${slug}"
