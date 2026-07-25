@@ -12,17 +12,17 @@ worked on its own branch, and is closed by a single pull request.
 
 ## Conventions
 
-- Name investigation directories with a short hyphenated title, `short-title/`,
-  and the branch `investigation/short-title`. Names are unique for the life of
-  the project.
-- Nothing touches `main` until close; active investigations are simply the
-  `investigation/*` branches.
+- Name investigation directories with a short hyphenated title,
+  `<short-title>/`, and the branch `investigation/<short-title>`. Names are
+  unique for the life of the project.
+- Nothing enters `main` until close. Chartering opens a **draft pull request**
+  as the visible registry of active investigations, and it becomes the closing
+  pull request at the end.
 - Investigation branches do not modify the Release zone (`src/`, `tests/`,
   `manuscript/`, …). If release changes are needed mid-investigation, edit
   and verify them in place, but commit them on a separate branch off `main`,
   then merge `main` back into the investigation branch.
-- A human, never an agent, merges the closing pull request—the merge is the
-  acceptance.
+- A human merges the closing pull request—the merge is the acceptance.
 
 ## Lifecycle
 
@@ -42,14 +42,15 @@ cp -R research/investigations/_template/. "research/investigations/${slug}/"
 ```
 
 Fill in `research/investigations/${slug}/README.md`, then commit and push
-the investigation branch.
+the investigation branch, and open the draft pull request.
 
 ```bash
 # Make sure to re-set slug if the previous shell session was closed:
 # slug="<short-title>"
 git add "research/investigations/${slug}"
 git commit -m "Charter investigation: ${slug}"
-git push -u origin "investigation/${slug}"  # Visibility to collaborators.
+git push -u origin "investigation/${slug}"
+gh pr create --draft --title "Investigation: ${slug}" --fill  # Or open a draft PR from GitHub.
 ```
 
 ### 2. Work
@@ -60,7 +61,7 @@ may be drafted as results stabilize, but must not lead the analysis.
 
 ### 3. Close
 
-Complete `REPORT.md`, finalize the investigation `README.md`, and open the
-closing pull request—the investigation directory together with resulting
-updates to `research/`'s memory files. Keep unrelated housekeeping and
-release-facing changes out of it. Once merged, delete the branch.
+Complete `REPORT.md`, finalize the investigation `README.md`, and add the
+resulting updates to `research/`'s memory files. Then mark the draft pull
+request ready for review. Keep unrelated housekeeping and release-facing
+changes out of it. Once merged, delete the branch.

@@ -144,7 +144,7 @@ While an investigation is active, everything in it is provisional; merging
 its closing PR accepts the completed dossier as project provenance.
 - **Coordination** — `STATUS.md`: current and queued tasks. A rough snapshot,
 not evidence; rewritten, never appended. It may note active work but is not a
-ledger of it — the `investigation/*` branches are the registry.
+ledger of it — the open draft PRs are the registry.
 - **Identified unknowns** — `QUESTIONS.md`: research-significant open questions,
 phrased so an answer could be recognised. Questions resolve however the answer
 arrives (investigation, promoted work, a decision, the literature); the
@@ -180,15 +180,17 @@ what changed scientifically. Reusable code, manuscript changes, and other
 release-facing artifacts follow their normal repository workflows rather than
 being hidden inside the investigation dossier.
 
-**Knowledge flows upward, and the promotion path is explicit.** Rough work
-(workbench, chat conclusions, collaborator results) becomes canonical via a
-*writeup*: a self-contained note (claim, support, scope, caveats, pointers to
-raw work) that an agent can draft (`write-up` skill) and that travels in a
-promotion PR together with the FINDINGS entry citing it. Merging that PR is
-the acceptance (P2). Conclusions with no repo evidence are staged as notes,
-not filed as findings. SURVEY holds what the field established; FINDINGS holds
-what this project established (including "we verified imported result X in our
-regime").
+**Knowledge flows upward through a legible record.** A conclusion becomes
+canonical only when something in the repo states the claim, its support, scope,
+and caveats — and a human merges the PR entering it (P2). In v0.1 that record
+is always an investigation's `REPORT.md`: everything routes through
+investigations, and the closing PR is the only promotion path. The alternative
+route — a self-contained writeup in `notes/`, drafted by a `write-up` skill and
+promoted in its own PR — is deferred until small conclusions are seen to strand
+with nowhere to go (§10). Conclusions with no repo evidence are staged as
+notes, not filed as findings. SURVEY holds what the field established; FINDINGS
+holds what this project established, including "we verified imported result X
+in our regime".
 
 **House style:** a `>` blockquote carries a file's *editing contract* (visible
 to humans, distinct from content) and marks a genuine editing regime — gates,
@@ -205,12 +207,13 @@ files point at it, never paraphrase it.
 - **PRs, two tiers.** *Mechanical (path-based, branch protection):* `src/`,
 `tests/` require a PR for anyone. *Convention (actor-based, in `AGENTS.md`):*
 agents never commit those directly; agent edits to `manuscript/` are PRs while
-human drafting is direct; each investigation closes with one PR; findings
-entered by agent hands arrive by PR even when a human asked. **Agents open
-PRs; humans merge them.** Everything else — notes, workbench,
-STATUS/QUESTIONS/SURVEY housekeeping, DECISIONS entries (recording a decision
-is making it; the commit witnesses it), literature, meetings, and all work
-inside an active investigation — is direct commit.
+human drafting is direct; each investigation closes with one PR; and entries to
+`FINDINGS.md` or `DECISIONS.md` made by agent hands arrive by PR even when a
+human asked — a human writing down a decision they have already taken commits
+it directly, since the commit witnesses a choice rather than proposing a claim.
+**Agents open PRs; humans merge them.** Everything else — notes, workbench,
+STATUS/QUESTIONS/SURVEY housekeeping, literature, meetings, and all work inside
+an active investigation — is direct commit.
 - **Investigations are bounded by construction.** The charter test is: could
 you recognise an answer if you saw one? The answer criterion need not be
 binary — a characterization with stated uncertainty, a decision-enabling
@@ -221,28 +224,25 @@ Investigations mark *work, not intentions*: they are created when substantive
 work begins, never automatically from conversations or merely because a
 question exists.
 
-  The investigation lifecycle is deliberately light — one gate, at the end.
-  Nothing touches `main` until close: active investigations are simply the
-  `investigation/*` branches, and the closing PR brings the investigation to
-  `main` for the first time. (The traveling statement of these conventions is
-  `research/investigations/README.md`, which owns them; this section
-  summarizes.)
+  The lifecycle is deliberately light — one gate, at the end.
+  `research/investigations/README.md` owns these conventions; this summarises.
 
-  1. **Charter.** From `main`, create the branch `investigation/<short-title>`;
-     copy `_template/` to `investigations/<short-title>/`; fill the README
-     (question, scope, answer criterion). Names are short hyphenated titles,
-     undated, unique for the life of the project.
+  1. **Charter.** Branch from `main`, copy `_template/`, fill the README
+     (question, scope, answer criterion), push, and open a **draft PR**. Names
+     are short hyphenated titles, undated, unique for the life of the project.
   2. **Work.** Direct commits on the branch, no ceremony. Keep the README's
      current state up to date and steer the science in `ANALYSIS.md`;
      `REPORT.md` may be drafted as sections stabilise but never leads —
      claims appear in the analysis first. If the question itself changes,
      close and start a new investigation.
-  3. **Close.** Complete `REPORT.md`; open the one closing PR, carrying the
-     full dossier together with resulting updates to the memory files
-     (`FINDINGS.md`, `DECISIONS.md`, `QUESTIONS.md`, `SURVEY.md`,
-     `STATUS.md`, as applicable). The PR proposes the conclusion; **the human
-     merges, and the merge is the acceptance.** After close, the dossier
-     changes only by PR.
+  3. **Close.** Complete `REPORT.md`, add the resulting updates to the memory
+     files, and mark the draft PR ready. **The human merges, and the merge is
+     the acceptance.** After close, the dossier changes only by PR.
+
+  The draft PR does the work a registry file would: it makes in-flight
+  investigations visible on `main`'s pull request list, gives collaborators a
+  place to comment mid-flight, and becomes the closing PR — so nothing enters
+  `main` early and there is still exactly one merge.
 
   A closing PR should be confined to its own investigation directory and the
   directly affected memory files — no unrelated housekeeping, no other
@@ -294,14 +294,13 @@ commit-time hook. Content-rewriting formatters (pyproject-fmt) never run on
 template files (they mangle placeholders); commented in config with a
 do-not-enable-until-instantiated warning.
 - Conventions from day one: one-sentence-per-line LaTeX; environments from
-`pyproject.toml` alone; figures only from `reproduce/`; investigation reports
-and literature notes cite from the project's shared bibliography (one
-citekey space across `literature/`, investigations, and `manuscript/`).
-Owners, per single ownership: figure destination → `reproduce/README.md`;
-shared bibliography → `literature/README.md`. One-sentence-per-line and TeX
-self-containment have **no traveling owner** since `manuscript/README.md` was
-dropped — a known gap; candidate homes are a comment header in `main.tex` or
-an always-apply line in `AGENTS.md` (§10).
+`pyproject.toml` alone; figures only from `reproduce/`; one citekey space
+across `literature/`, investigations, and `manuscript/`, generated by the
+reference manager and never hand-edited. Owners, per single ownership: figure
+destination → `reproduce/README.md`; bibliography → `literature/README.md`;
+the never-hand-edit rule → `AGENTS.md`. The LaTeX conventions have **no
+traveling owner** since `manuscript/README.md` was dropped — a known gap, with
+a comment header in `main.tex` or an `AGENTS.md` line as candidates (§10).
 - **Deferred with named triggers** (second-use rule): a chronological
 `LOG.md` returns if session-level history proves to have no home or the
 analysis bloats with it; a curated "investigation record" section inside
@@ -324,41 +323,41 @@ do not modify its internals in an instantiated project.
   README.md            # the framework's own readme (what this layer is)
   export.sh            # Release → fresh repo; verify; stop before pushing
   check_zones.py       # Release must not depend on non-exported paths
-  templates/           # instantiation templates, rendered once at init:
+  init/                # instantiation templates, rendered once at init:
     README.md          #   → root README.md (project/companion README)
     CITATION.cff       #   structured fill-in metadata
   tests/               # framework tests — TEMPLATE-REPO-ONLY (§8)
 ```
 
-Flat until the script count warrants subdirectories (the instantiation assets
-currently live under `.stemma/init/`). **Template taxonomy — form follows
-instance shape:** *instantiation templates* (rendered once) live under
+Flat until the script count warrants subdirectories. **Template taxonomy —
+form follows instance shape:** *instantiation templates* (rendered once) live under
 `.stemma/`; *runtime templates* live in place in `research/`, editable as the
 project's methodology evolves, in two forms — multi-file instances ship a
 `_template/` directory (investigations), while single-file instances embed
 their template in the directory's README (literature notes, meeting records);
 *singleton stubs* (the memory files) ship as the files themselves, structure
-and prompts baked in. LICENSE is none of these — a
-canonical legal text `init.sh` selects and stamps (copyright line only), never a
-hand-maintained skeleton (legal-text drift is not "close enough").
+and prompts baked in. LICENSE is none of these — a canonical legal text
+`init.sh` selects and stamps (copyright line only), never a hand-maintained
+skeleton (legal-text drift is not "close enough").
 
-**Agent instruction, three tiers:** `AGENTS.md` the sparse router (map,
-always-apply rules — the charter consent rule, agents-open-PRs-humans-merge,
-Release-zone changes during research work get their own PR off `main`, and
-don't read or summarize the Research zone by default — precedence over local
-READMEs, pointer to `.stemma/` scripts); skills the procedures (v0.1: `new-investigation`, plus
-`write-up` for the promotion path — both artifact-producing, hence
-world-state-testable); `.claude/` the vendor remainder. Facts sort by scope:
+**Agent instruction, three tiers:** `AGENTS.md` the sparse router — the zone
+map, precedence over local READMEs, a pointer to `.stemma/` scripts, and the
+always-apply rules: agents open PRs and never merge; charter changes (question,
+scope, answer criterion) need the researcher's explicit go-ahead; Release-zone
+changes during research work get their own branch off `main`; `references.bib`
+is generated and never hand-edited; don't read or summarise the Research zone
+by default. Then skills, the procedures (v0.1: `new-investigation` and
+`add-source` — both artifact-producing, hence world-state-testable); then
+`.claude/`, the vendor remainder. Facts sort by scope:
 everywhere → AGENTS.md; named-task procedure → skill; this-directory-only →
 its README; and each memory file's own contract governs itself.
 
 ## 7. Testing
 
 - **Project code** — `ci.yml` (travels): install `.[dev]` across a small Python
-matrix (floor and current — a research project runs on one interpreter; wide
-matrices are a library posture),
-pytest, plus `pre-commit run --all-files` as the unbypassable enforcement copy
-of the hooks. The template ships a working `project_name` package and smoke
+matrix (floor and current — a research project runs on one interpreter, and
+wide matrices are a library posture), pytest, plus `pre-commit run --all-files`
+as the unbypassable enforcement copy of the hooks. The template ships a working `project_name` package and smoke
 test, so this CI passes on the template repo itself.
 - **Framework tooling** — tested in the Stemma repo's own CI (`stemma.yml`,
 path-filtered to `.stemma/**` — path-filtering's first legitimate use), tests
@@ -370,22 +369,22 @@ until the scripts have real logic; scripts should take args (not only
 interactive prompts) so tests can drive them.
 - **Agent behaviour** — not cheaply CI-able; test the *world-state a workflow
 must leave*. For investigations, deterministic checks can assert that the
-dossier's README contains a recognisable question and answer criterion, that
-the `investigation/*` branch exists while active (the branch list is the
-in-flight registry; no file tracks it), that `REPORT.md` is non-empty in the
-closing PR, and that the closing PR's changed paths are confined to the
-investigation's own directory plus the affected root memory files. P1's payoff is that
+dossier's README contains a recognisable question and answer criterion, that an
+open draft PR exists while the investigation is active (the registry, and
+queryable via the API), that `REPORT.md` is non-empty when the PR is marked
+ready, and that its changed paths are confined to the investigation's own
+directory plus the affected root memory files. P1's payoff is that
 output-is-a-diff makes these workflows testable without an LLM judge.
 
 ## 8. Instantiation
 
 The template ships as a working package `project_name` (import) /
 `project-name` (distribution) so it builds pre-instantiation. `init.sh` (root,
-run-once; v0.1 may just print the checklist) renames both forms — different
-strings, separate substitutions — across `pyproject.toml`, `src/`, and the smoke
-test; fills metadata; renders `.stemma/templates/` (project README → root,
-replacing the template's own README, which never travels); writes the stamped
-LICENSE; installs pre-commit; then greps for surviving
+run-once) renames both forms — different strings, separate substitutions —
+across `pyproject.toml`, `src/`, and the smoke test; fills metadata; renders
+`.stemma/init/` (project README → root, replacing the template's own README,
+which never travels); writes the stamped LICENSE; installs pre-commit; then
+greps for surviving
 `project_name`/`project-name`/`{{...}}` and warns — CI cannot catch a
 wrong-but-consistent rename. Checklist includes enabling branch protection on
 `src/`/`tests/`.
@@ -397,7 +396,8 @@ One rule: **does a researcher *using* the framework need it, or only someone
 zone content and stubs. Template-repo-only: `DESIGN.md`, the template's root
 README, `.github/assets/` (the Stemma logo — note `.github/workflows/`
 travels), `.stemma/init/` (instantiation templates, consumed at init), and
-`.stemma/tests/`. `init.sh` owns this list and deletes each path. The tools travel; the tools' tests do not.
+`.stemma/tests/`. `init.sh` owns this list and deletes each path. The tools
+travel; the tools' tests do not.
 
 ## 10. Open questions (for the pilot)
 
@@ -419,16 +419,19 @@ back?
 survive real closes?
 - Is the absence of a chronological log ever actually felt (session history
 with no home; analysis bloating with narrative)?
-- Does the branch-only registry suffice — is in-flight work ever lost or
-forgotten with no STATUS mandate at charter, and does anyone miss browsable
-charters on `main` mid-flight?
+- Does the draft PR work as the registry — do collaborators actually find and
+comment on in-flight investigations there, and does the draft survive to become
+the closing PR rather than being opened late?
 - Does DECISIONS fill, or was its revival premature? Does QUESTIONS' Resolved
 section fill (working) or stay empty while Open grows (graveyard → fold into
 STATUS)?
-- Does STATUS's Summary (which now carries the "why" for the task list) stay
-current, or does the inline-why-per-task pattern prove more self-maintaining?
-- Skills across surfaces; progressive disclosure; whether `write-up` and
-`new-investigation` suffice or a meeting routine earns its place.
+- Does STATUS stay a snapshot, or drift into a backlog that GitHub Issues
+should hold? Does its Summary stay current, or does an inline why-per-task
+prove more self-maintaining?
+- Is `workbench/` used, or does routing everything through investigations
+absorb it — the trigger to drop it from the instantiated template?
+- Skills across surfaces; progressive disclosure; whether `new-investigation`
+and `add-source` suffice or a meeting routine earns its place.
 - Framework model: do projects actually `copier update`, or drift?
 - Literature wiring (reference manager/MCP); grep-level vs AST-level zone check;
 lockfiles (uv); Issues vs STATUS for tasks; data at scale (DVC/Zenodo);
@@ -448,29 +451,39 @@ lifecycle in `investigations/README.md`; literature and meeting templates
 embedded in their directory READMEs; Release READMEs for `data/` and
 `reproduce/`; a manuscript skeleton — `main.tex`, `references.bib`,
 `figures/` — compiling standalone), pre-commit + CI green on the shipped
-package, a sparse
-`AGENTS.md` (carrying the always-apply rules of §6), two skills
+package, a sparse `AGENTS.md` (the always-apply rules of §6), two skills
 (`new-investigation`, `add-source`), `check_zones.py` at grep level, and stub
 `export.sh`/`init.sh` carrying their spec in comments. No framework tests yet.
-No log file, no render script, no fixed report skeleton — each deferred with a
-named trigger (§5). **Before tagging v0.1:** implement `init.sh` against its spec, and scope the
+No log file, no render script, no fixed report skeleton, no `write-up` — each
+deferred with a named trigger (§5, §10).
+
+**Before tagging v0.1:** implement `init.sh` against its spec; scope the
 cosmetic hygiene hooks (`trailing-whitespace`, `end-of-file-fixer`) away from
 `research/` — deferred so the template's own files stay clean while it is the
-product. **Pilot:** run one real bounded investigation and one real
-workbench→FINDINGS promotion through the skills; log what fought back; findings
-return here as issues; v0.2 follows the evidence.
+product; fill the root README's empty sections with one concrete end-to-end
+walkthrough, which will explain Stemma better than more architecture.
+
+**Pilot:** run one real bounded investigation end to end — charter, draft PR,
+literature, analysis, report, merge, FINDINGS and QUESTIONS updates. Log what
+fought back; findings return here as issues; v0.2 follows the evidence. The
+next useful information about this design comes from using it, not from
+extending this document.
 
 ---
 
-*Changes from the prior draft:* recorded the **linting posture** settled while
-building the config layer — ruff as an allow-list (`include` in pyproject *and*
-`files:` on the hooks, since neither alone covers both entry points), a rule
-set chosen against the formatter rather than duplicating it, safety hygiene
-repo-wide but cosmetic hygiene scoped away from `research/` before release, and
-line endings handled by `.gitattributes` rather than a commit-time hook;
-trimmed the CI matrix (a research project runs on one interpreter); added
-`.github/assets/` and `.stemma/init/` to the template-only list, which
-`init.sh` now owns and enumerates in its spec; swapped `write-up` for
-`add-source` in v0.1 skills, making **everything route through investigations**
-and rewriting the corresponding pilot question — the trigger to build `write-up`
-is small conclusions stranding with nowhere to go.
+*Changes from the prior draft:* adopted the **draft PR at charter** — opened
+when the investigation is chartered, it is the registry of in-flight work, the
+place to comment mid-flight, and the same PR that closes the investigation, so
+nothing enters `main` early and there is still one merge; the branch-registry
+pilot question is retired accordingly. Sharpened the acceptance rule: entries
+to `FINDINGS.md` *or* `DECISIONS.md` made by agent hands arrive by PR, while a
+human recording a decision they have taken commits directly. Made per-source
+literature notes explicitly **selective**, and gave the never-hand-edit rule
+for the generated bibliography an owner in `AGENTS.md`. Recorded the linting
+posture settled while building the config layer (ruff as an allow-list needing
+both `include` and hook `files:`; a rule set chosen against the formatter;
+safety hygiene repo-wide, cosmetic hygiene scoped away from `research/` before
+release; line endings via `.gitattributes`), trimmed the CI matrix, corrected
+`.stemma/init/` throughout, and swapped `write-up` for `add-source` in v0.1 —
+v0.1 routes **everything through investigations**, and small conclusions
+stranding is the trigger to build the writeup route.

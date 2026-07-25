@@ -3,7 +3,8 @@
 > Project-level choices and their rationale—methods, tools, conventions, scope,
 > strategy. Records what was decided, as opposed to established knowledge, which
 > belongs in `FINDINGS.md`. Append only; if a decision is reversed, record the
-> new decision and cite the one it supersedes.
+> new decision and cite the one it supersedes. Agent-entered decisions arrive
+> by PR.
 
 <!-- - Decision. Alternatives considered, when applicable. Rationale where it
        isn't obvious. -->
