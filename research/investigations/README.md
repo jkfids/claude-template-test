@@ -1,8 +1,8 @@
 # Investigations
 
-Bounded units of research work. Each investigation asks one question with a
-recognizable endpoint, lives in its own directory copied from `_template/`, is
-worked on its own branch, and is closed by a single pull request.
+Bounded units of research work. Each investigation pursues one stated objective with a recognizable endpoint, lives in its own directory copied
+from `_template/`, is worked on its own branch, and is closed by a single
+pull request.
 
 ## Template layout
 
@@ -21,7 +21,7 @@ worked on its own branch, and is closed by a single pull request.
 - Investigation branches do not modify the Release zone (`src/`, `tests/`,
   `manuscript/`, …). If release changes are needed mid-investigation, edit
   and verify them in place, but commit them on a separate branch off `main`,
-  then merge `main` back into the investigation branch.
+  then merge (rather than rebase) `main` back into the investigation branch.
 - A human merges the closing pull request—the merge is the acceptance.
 
 ## Lifecycle
@@ -29,8 +29,8 @@ worked on its own branch, and is closed by a single pull request.
 ### 1. Charter
 
 Create the investigation branch from `main`, copy the template to a new
-directory, and fill in its `README.md`: the question, its scope, and what
-would conclude it.
+directory, and fill in its `README.md`: its objective, its scope, and its
+completion criterion.
 
 ```bash
 # In project root.

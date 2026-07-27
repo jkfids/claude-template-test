@@ -573,6 +573,9 @@ TSWLatexianTemp*
 # Only the root of manuscript/ is ignored
 manuscript/*.pdf
 
+# Don't track PDFs in literature/
+research/literature/**/*.pdf
+
 # Claude
 CLAUDE.local.md
 .claude/settings.local.json
