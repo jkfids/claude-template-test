@@ -1,6 +1,7 @@
 # Investigations
 
-Bounded units of research work. Each investigation pursues one stated objective with a recognizable endpoint, lives in its own directory copied
+Bounded units of research work. Each investigation pursues one stated
+objective with a recognizable endpoint, lives in its own directory copied
 from `_template/`, is worked on its own branch, and is closed by a single
 pull request.
 

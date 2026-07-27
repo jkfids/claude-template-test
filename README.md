@@ -67,7 +67,7 @@ Operations
   AGENTS.md                        # Entry point and router for agents
   CLAUDE.md                        # Points at AGENTS.md
   .agents/skills/                  # Reusable agent workflows (SKILL.md)
-  .claude/                         #
+  .claude/                         # Claude Code config
   init.sh                          # Sets up the template as a new project
   .stemma/                         # Framework layer: scripts, templates, tools
 ```
