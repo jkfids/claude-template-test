@@ -12,6 +12,12 @@
 > artifact: it lives in the Stemma repository and does not travel into
 > instantiated projects (§9). A project's own overview lives in `PROJECT.md`;
 > a project's own decision log lives in `research/DECISIONS.md`.
+>
+> **This is a logbook, not a specification.** The shipped files are the source
+> of truth: `AGENTS.md` and the directory READMEs govern behaviour, and where
+> this document disagrees with them, they win and this document is stale. Read
+> it for reasoning and history — why a choice was made, what was rejected, what
+> is still open — not for the current rules.
 
 ## 1. Purpose
 
@@ -33,6 +39,17 @@ Provider neutrality follows from two open standards carrying the portable
 interface: `AGENTS.md` (read by most agent tools) for project instructions, and
 the Agent Skills format (`SKILL.md`) for reusable procedures. Only genuinely
 client-specific adapters live in a vendor directory (`.claude/`).
+
+The neutrality is partial, and the seam is *location, not format*. The Agent
+Skills spec defines what goes inside a skill directory but not where skill
+directories live; `.agents/skills/` is a cross-client convention rather than a
+requirement, and Claude Code discovers skills only under `.claude/skills/`.
+`AGENTS.md` has the same shape of problem: Claude Code reads `CLAUDE.md`, not
+`AGENTS.md`. So the canonical files stay portable and each client gets a bridge
+— an `@AGENTS.md` import, and a symlink or copy for skills — generated at
+instantiation (§8). Symlinks make Unix the supported target; Windows needs
+Administrator or Developer Mode and silently checks a symlink out as a text
+file containing its target path, which fails invisibly.
 
 Development loop: design the template here → instantiate it in a real project →
 run real work through it → return findings → revise.
@@ -124,14 +141,16 @@ Operations                           # shared control plane; not exported
   AGENTS.md                          # portable router (root: tool-discovered)
   CLAUDE.md                          # Claude adapter: @AGENTS.md import
   .agents/skills/                    # portable procedures (tool-discovered)
-  .claude/                           # Claude-specific remainder
+  .claude/                           # Claude adapter: permissions, skills bridge
   init.sh                            # run-once entry point (root: visible)
   .stemma/                           # managed framework machinery (§6)
 ```
 
 **Placement rule:** if an external tool must *discover* it by scanning
 conventional paths, it lives at root (`AGENTS.md`, skills, `.claude/`); if only
-our own code invokes it by explicit path, it lives in `.stemma/`.
+our own code invokes it by explicit path, it lives in `.stemma/`. Discovery
+paths are per-client and not standardised (§1), so "at root" means the
+canonical copy is at root and a client bridge points at it.
 
 ## 4. Project memory: the epistemic hierarchy
 
@@ -145,7 +164,7 @@ DECISIONS records choices; each contract states the boundary from its side.
 a writeup in `notes/`, a legible `workbench/` directory, or a citation key for
 verified external results. Provenance is heterogeneous by design; the
 canonical entry's link says which kind. A closed investigation is a
-self-contained dossier: `README.md` carries the question, scope, answer
+self-contained dossier: `README.md` carries the objective, scope, completion
 criterion, and final state; `ANALYSIS.md` is the technical record sufficient
 to understand, check, and reproduce the work; `REPORT.md` is the final,
 self-contained account — FINDINGS provenance links land on the report.
@@ -168,8 +187,8 @@ themselves.
 **Investigations are organised by kind of knowledge, not by lifecycle
 moment.** Each investigation directory holds three files with distinct roles:
 
-- `README.md` — the control center: question, scope, answer criterion, and
-  current state. Concise, current, and high-level; a researcher or agent
+- `README.md` — the control center: objective, scope, completion criterion,
+  and current state. Concise, current, and high-level; a researcher or agent
   should grasp where things stand without reading the analysis.
 - `ANALYSIS.md` — the living technical record: synthesis, derivations,
   figures, interpretation. Rewritten and reorganised freely as understanding
@@ -224,25 +243,34 @@ it directly, since the commit witnesses a choice rather than proposing a claim.
 STATUS/QUESTIONS/SURVEY housekeeping, literature, meetings, and all work inside
 an active investigation — is direct commit.
 - **Investigations are bounded by construction.** The charter test is: could
-you recognise an answer if you saw one? The answer criterion need not be
-binary — a characterization with stated uncertainty, a decision-enabling
-comparison, or "cannot be determined, because…" all qualify — but if no
-recognisable endpoint can be stated, the work is not ready to be an
-investigation and stays in workbench/ or notes/ until one crystallizes.
-Investigations mark *work, not intentions*: they are created when substantive
-work begins, never automatically from conversations or merely because a
-question exists.
+someone else tell when this is done? An investigation states an *objective*
+and a *completion criterion*, and neither has to be question-shaped. Answering
+a question qualifies; so does a characterization with stated uncertainty, a
+decision-enabling comparison, "cannot be determined, because…", and — the case
+that forced this wording — orientation work, where the objective is to
+understand a topic and the criterion states the ground that must be covered.
+What does not qualify is a criterion only its author can evaluate ("until we
+feel we understand it"); that work stays in workbench/ or notes/ until a
+recognisable endpoint crystallizes. Investigations mark *work, not intentions*:
+they are created when substantive work begins, never automatically from
+conversations or merely because a question exists.
+
+  This replaces an earlier framing built entirely around answering a question,
+  which would have disqualified the pilot's own first investigation — a survey
+  of a method's variants — before it started. Survey and orientation work is a
+  first-class investigation type, not a lesser one.
 
   The lifecycle is deliberately light — one gate, at the end.
   `research/investigations/README.md` owns these conventions; this summarises.
 
   1. **Charter.** Branch from `main`, copy `_template/`, fill the README
-     (question, scope, answer criterion), push, and open a **draft PR**. Names
-     are short hyphenated titles, undated, unique for the life of the project.
+     (objective, scope, completion criterion), push, and open a **draft PR**.
+     Names are short hyphenated titles, undated, unique for the life of the
+     project.
   2. **Work.** Direct commits on the branch, no ceremony. Keep the README's
      current state up to date and steer the science in `ANALYSIS.md`;
      `REPORT.md` may be drafted as sections stabilise but never leads —
-     claims appear in the analysis first. If the question itself changes,
+     claims appear in the analysis first. If the objective itself changes,
      close and start a new investigation.
   3. **Close.** Complete `REPORT.md`, add the resulting updates to the memory
      files, and mark the draft PR ready. **The human merges, and the merge is
@@ -258,21 +286,23 @@ question exists.
   investigations, no release-facing implementation work. Investigation
   branches do not modify the Release zone: a needed `src/`/`tests/` change is
   edited and verified in place but committed on a separate branch off `main`
-  through the normal PR lane, then `main` is merged back into the
-  investigation branch. An investigation abandoned early with nothing
-  established simply deletes its branch; one abandoned with something worth
+  through the normal PR lane, then `main` is merged — not rebased, since the
+  branch is pushed with an open PR — back into the investigation branch. An
+  investigation abandoned early with nothing established simply deletes its
+  branch; one abandoned with something worth
   keeping closes normally, with a short report recording what was established
   and why work stopped.
 
 - **Charter changes are consent-gated, not ceremony-gated.** There is no
 amendment trail, no frozen charter, and no mid-flight visibility on main —
 readable over auditable (P4). The protection is an actor rule in `AGENTS.md`:
-**agents do not modify an investigation's question, scope, or answer
-criterion without the researcher's explicit go-ahead** — propose the change
-and the reason, then wait. The researcher edits their own charter freely.
-The agent's further duty is to notice when incremental refinement has become
-replacement and say so, since scope creep is the failure mode neither party
-sees from inside.
+**agents do not modify an investigation's objective, scope, or completion
+criterion without the researcher's explicit go-ahead** — propose the change,
+then wait. The researcher edits their own charter freely. A further duty —
+noticing when incremental refinement has become replacement, since scope creep
+is the failure mode neither party sees from inside — was drafted into
+`AGENTS.md` and cut for length; whether its absence is felt is a pilot
+question (§10).
 - **Export is a fail-closed allowlist**; nothing in Release may depend on
 anything not exported (the one silently-violated invariant; mechanically
 checked by `check_zones.py`). Manuscript is a self-contained TeX root: figures
@@ -306,8 +336,11 @@ do-not-enable-until-instantiated warning.
 `pyproject.toml` alone; figures only from `reproduce/`; one citekey space
 across `literature/`, investigations, and `manuscript/`, generated by the
 reference manager and never hand-edited. Owners, per single ownership: figure
-destination → `reproduce/README.md`; bibliography → `literature/README.md`;
-the never-hand-edit rule → `AGENTS.md`. The LaTeX conventions have **no
+destination → `reproduce/README.md`; bibliography and citekey provenance
+(keys come from the bibliography; never invent one) → `literature/README.md`;
+the never-hand-edit rule → `AGENTS.md`. Source PDFs are untracked
+(`research/literature/**/*.pdf`) — the notes are the durable record, not the
+papers they distil. The LaTeX conventions have **no
 traveling owner** since `manuscript/README.md` was dropped — a known gap, with
 a comment header in `main.tex` or an `AGENTS.md` line as candidates (§10).
 - **Deferred with named triggers** (second-use rule): a chronological
@@ -351,17 +384,39 @@ and prompts baked in. LICENSE is none of these — a canonical legal text
 `init.sh` selects and stamps (copyright line only), never a hand-maintained
 skeleton (legal-text drift is not "close enough").
 
-**Agent instruction, three tiers:** `AGENTS.md` the sparse router — the zone
-map, precedence over local READMEs, a pointer to `.stemma/` scripts, and the
-always-apply rules: agents open PRs and never merge; charter changes (question,
-scope, answer criterion) need the researcher's explicit go-ahead; Release-zone
-changes during research work get their own branch off `main`; `references.bib`
-is generated and never hand-edited; don't read or summarise the Research zone
-by default. Then skills, the procedures (v0.1: `new-investigation` and
-`add-source` — both artifact-producing, hence world-state-testable); then
-`.claude/`, the vendor remainder. Facts sort by scope:
-everywhere → AGENTS.md; named-task procedure → skill; this-directory-only →
-its README; and each memory file's own contract governs itself.
+**Agent instruction, three tiers:** `AGENTS.md` the sparse router; then skills,
+the procedures (v0.1: `new-investigation` — artifact-producing, hence
+world-state-testable); then `.claude/`, the vendor remainder. Facts sort by
+scope: everywhere → AGENTS.md; named-task procedure → skill; this-directory-only
+→ its README; and each memory file's own contract governs itself.
+
+`AGENTS.md` shipped at ~70 lines: a framing line, a two-file entry point, the
+three zones with their export boundary and links to the owning READMEs, the
+always-apply rules, two commands, and a closing principle. `AGENTS.md` itself
+is authoritative for the current rules; what follows is why it has the shape it
+does.
+
+- **No repository tree, and no general theory of precedence.** Both were
+drafted and cut. Directory layouts are discoverable, and the available evidence
+is that instruction files do not function as repository overviews; what stays is
+what an agent cannot infer, which is *policy* (what is exported, what may depend
+on what) rather than *layout*. Precedence prose resolves conflicts that
+shouldn't exist between files with one author, and would not reliably resolve
+them anyway.
+- **Every prohibition carries its action.** A bare "don't" makes agents
+conservative and exploratory; the paired form is what makes the rule usable.
+Rationale is kept only where it helps an agent generalise to a case the rule
+didn't anticipate ("the merge is acceptance" forecloses clever equivalents),
+and cut where the instruction is already complete.
+- **Commands earn their place by being non-obvious.** `pytest` and
+`pre-commit` are guessable and left out. `gh pr list --draft` is in because the
+draft-PR registry (§5) exists nowhere an agent would look — `STATUS.md` says
+outright that it is not a ledger of active work.
+- **Rules 1 and 2 are the load-bearing ones, and they live in the softest
+layer.** Instruction files are context, not enforcement; a client can be told
+not to merge but not thereby prevented from merging. Durable enforcement is a
+client permission rule, which is a job for `.claude/` once the pilot shows it
+is needed.
 
 ## 7. Testing
 
@@ -380,7 +435,8 @@ until the scripts have real logic; scripts should take args (not only
 interactive prompts) so tests can drive them.
 - **Agent behaviour** — not cheaply CI-able; test the *world-state a workflow
 must leave*. For investigations, deterministic checks can assert that the
-dossier's README contains a recognisable question and answer criterion, that an
+dossier's README contains a recognisable objective and completion criterion,
+that an
 open draft PR exists while the investigation is active (the registry, and
 queryable via the API), that `REPORT.md` is non-empty when the PR is marked
 ready, and that its changed paths are confined to the investigation's own
@@ -424,7 +480,7 @@ conclusions strand with nowhere to be promoted (the trigger to build `write-up`
 and the `notes/` writeup route)? Does the humans-merge rule hold?
 - **The ownership assumption:** the frictionless investigation model assumes an
 engaged researcher steering the work — that is its integrity mechanism (P4).
-If an investigation runs in low-touch mode, does the question drift without
+If an investigation runs in low-touch mode, does the objective drift without
 anyone noticing? Does close-time review alone suffice to catch it?
 - Does the investigation README stay a concise control center, or drift into
 duplicating the analysis? Does ANALYSIS hold its boundary with the README?
@@ -448,7 +504,13 @@ prove more self-maintaining?
 - Is `workbench/` used, or does routing everything through investigations
 absorb it — the trigger to drop it from the instantiated template?
 - Skills across surfaces; progressive disclosure; whether `new-investigation`
-and `add-source` suffice or a meeting routine earns its place.
+alone suffices, or `add-source` and a meeting routine earn their place.
+- Does the completion-criterion framing hold for orientation work — do survey
+investigations state a criterion someone else can evaluate, or drift back to
+"until we feel done"?
+- Does the absence of the scope-creep duty (cut from `AGENTS.md` for length,
+§5) get felt — does an agent refine an objective into a different one without
+anyone saying so?
 - Framework model: do projects actually `copier update`, or drift?
 - Literature wiring (reference manager/MCP); grep-level vs AST-level zone check;
 lockfiles (uv); Issues vs STATUS for tasks; data at scale (DVC/Zenodo);
@@ -456,8 +518,13 @@ non-coder entry points; the md→PDF render path for reports.
 - Do the LaTeX conventions (one-sentence-per-line, self-contained TeX root)
 need a traveling home, or does the manuscript's own shape teach them?
 - Does the portable extension layer work across clients without duplicated
-policy? Verify discovery paths and adapter strategy at scaffold time; decide
-whether v0.1 needs one paved reference client or only compatibility checks.
+policy? The format is portable and the location is not (§1); the open part is
+whether a generated bridge is enough, and whether v0.1 needs one paved
+reference client or only compatibility checks. Verify at scaffold time that a
+symlinked skills directory is actually discovered.
+- Client-side memory features write an unreviewed record outside the
+repository, parallel to the one this design makes reviewable (P1, P2). Disable
+by default in `.claude/`, or does it prove useful enough to keep and ignore?
 
 ## 11. v0.1 scope
 
@@ -469,17 +536,27 @@ lifecycle in `investigations/README.md`; literature and meeting templates
 embedded in their directory READMEs; Release READMEs for `data/` and
 `reproduce/`; a manuscript skeleton — `main.tex`, `references.bib`,
 `figures/` — compiling standalone), pre-commit + CI green on the shipped
-package, a sparse `AGENTS.md` (the always-apply rules of §6), two skills
-(`new-investigation`, `add-source`), `check_zones.py` at grep level, and stub
-`export.sh`/`init.sh` carrying their spec in comments. No framework tests yet.
-No log file, no render script, no fixed report skeleton, no `write-up` — each
-deferred with a named trigger (§5, §10).
+package, a sparse `AGENTS.md` (§6), `CLAUDE.md` importing it, and one skill
+(`new-investigation`). Stub `export.sh`/`init.sh` carry their spec in comments.
+No framework tests yet. No log file, no render script, no fixed report
+skeleton, no `write-up` — each deferred with a named trigger (§5, §10).
+
+Cut or deferred out of the earlier v0.1 list, all for the same reason — the
+pilot cannot exercise them, so building them would return no evidence:
+`add-source` (its shape depends on how literature intake settles, so building
+it first means building it twice); `check_zones.py` (it guards Release against
+depending on non-exported paths, and a literature-heavy investigation touches
+neither side of that boundary); `.claude/` contents (three candidate jobs
+identified — merge permissions, a skills bridge, disabling client-side memory —
+none yet confirmed); and `init.sh` (instantiate by hand once, which is the
+spec's dry run and will produce a better script).
 
 **Before tagging v0.1:** implement `init.sh` against its spec; scope the
 cosmetic hygiene hooks (`trailing-whitespace`, `end-of-file-fixer`) away from
 `research/` — deferred so the template's own files stay clean while it is the
 product; fill the root README's empty sections with one concrete end-to-end
-walkthrough, which will explain Stemma better than more architecture.
+walkthrough — written *from* the pilot rather than before it, since the
+walkthrough written today would be the one imagined rather than the one run.
 
 **Pilot:** run one real bounded investigation end to end — charter, draft PR,
 literature, analysis, report, merge, FINDINGS and QUESTIONS updates. Log what
@@ -489,30 +566,35 @@ extending this document.
 
 ---
 
-*Changes from the prior draft.* **Positioning:** Stemma is stated as the
-repository-native control plane — it holds state, evidence, and acceptance
-rules, while models, agent tools, and work surfaces stay replaceable execution
-choices; it does not run agent loops, and instantiation configures the project
-rather than pinning a client (§1, §6, §8).
+*Changes from the prior draft.* **Status:** this document is demoted to a
+logbook. The shipped files govern; where this disagrees with them it is stale
+(header).
 
-**Workflow:** adopted the **draft PR at charter** — opened when an
-investigation is chartered, it is the registry of in-flight work, the place to
-comment mid-flight, and the same PR that closes the investigation, so nothing
-enters `main` early and there is still one merge; the branch-registry pilot
-question retires accordingly (§5, §7, §10). Sharpened the acceptance rule:
-entries to `FINDINGS.md` *or* `DECISIONS.md` made by agent hands arrive by PR,
-while a human recording a decision they have taken commits it directly (§5).
-Per-source literature notes are explicitly **selective**, and the
-never-hand-edit rule for the generated bibliography has an owner in `AGENTS.md`
-(§5, §6).
+**Investigations:** the charter test no longer requires a question. An
+investigation states an **objective** and a **completion criterion**, and
+orientation or survey work qualifies when the criterion states the ground to be
+covered. The prior framing — "could you recognise an answer if you saw one",
+with anything else sent to `notes/` — would have disqualified the pilot's own
+first investigation. Vocabulary changed throughout: *answer criterion* →
+*completion criterion*, *question* → *objective* where the charter is meant
+(§4, §5, §7). The restart trigger is a changed objective, not a changed scope,
+since scope narrows routinely.
 
-**Tooling:** recorded the linting posture settled while building the config
-layer — ruff as an allow-list needing both `include` and hook `files:`, a rule
-set chosen against the formatter rather than duplicating it, safety hygiene
-repo-wide but cosmetic hygiene scoped away from `research/` before release, and
-line endings via `.gitattributes` (§5); trimmed the CI matrix (§7); corrected
-`.stemma/init/` throughout (§6, §8).
+**Agent instruction:** `AGENTS.md` shipped, and §6 now records why it has the
+shape it does rather than specifying it — no repository tree, no precedence
+ladder, prohibitions paired with actions, rationale only where it aids
+generalisation, commands only where non-obvious. Provider neutrality is
+qualified: the skills *format* is portable but the *location* is not, so
+canonical files stay portable and clients get a generated bridge, which makes
+Unix the supported target (§1, §3, §6, §8). Noted that instruction files are
+context rather than enforcement, so the never-merge rule's durable form is a
+client permission rule (§6).
 
-**Scope:** swapped `write-up` for `add-source` in v0.1, so everything routes
-through investigations; small conclusions stranding with nowhere to go is the
-trigger to build the writeup route (§4, §10, §11).
+**Literature:** citekey provenance has an owner — keys come from the
+bibliography and are never invented (`literature/README.md`). Source PDFs are
+untracked; the notes are the durable record (§5).
+
+**Scope:** `add-source`, `check_zones.py`, `.claude/` contents, and `init.sh`
+are deferred out of v0.1 on one shared criterion — the pilot cannot exercise
+them, so building them returns no evidence. `CLAUDE.md` is added, since without
+it `AGENTS.md` is inert in Claude Code (§11).
