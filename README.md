@@ -5,7 +5,7 @@
   </picture>
 </h1>
 
-> **Status:** Very WIP; conventions are still settling.
+> **Status:** pre-v0.1; conventions are still settling.
 
 A monorepository template for AI-assisted academic research, supporting the
 full project lifecycle—literature, theory, numerics, reproducible results, and
@@ -14,9 +14,24 @@ rigorous verification and flexible collaboration. It is designed to fit within a
 wider software stack, including AI tools, reference managers, and communication
 platforms.
 
-## In practice
-
 ## TO DO
+- `init.sh` is a stub—instantiate by hand or via AI.
+- No `.stemma/` scripts. `export.sh` is unwritten, so the export boundary has
+  no mechanism, and nothing checks that Release avoids non-exported paths.
+- No framework tests: instantiation, export safety, agent world-state.
+- No Stemma-native skills. `new-investigation` is unwritten; the four installed
+  skills are borrowed and vendored unmodified.
+- `.claude/` holds only the skills symlink. Without `settings.json`, the
+  never-merge rule is convention rather than enforcement.
+- No `LICENSE` or `CITATION.cff`, and no templates for them in `.stemma/init/`
+  — the rendered project README already links to both.
+- No reference manager wired up, so `manuscript/references.bib` is unmanaged.
+- Cosmetic pre-commit hooks still run on `research/`.
+- This README is incomplete: *In practice*, *Quickstart*, and
+  *How to use* will be written for v0.1.
+- Poor Windows compatibility.
+
+## In practice
 
 ## Structure
 
@@ -76,3 +91,4 @@ Operations
 
 
 ## How to use
+
