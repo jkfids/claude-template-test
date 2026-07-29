@@ -13,7 +13,9 @@ repos:
     hooks:
       - id: trailing-whitespace  # Remove trailing whitespace
         args: [--markdown-linebreak-ext=md]
+        exclude: ^\.agents/skills/
       - id: end-of-file-fixer  # Ensure files end with a newline
+        exclude: ^\.agents/skills/
       - id: check-merge-conflict  # Catch unresolved merge conflict markers
       - id: check-added-large-files  # Block large files from being committed
         args: [--maxkb=5000]
@@ -35,9 +37,9 @@ repos:
     hooks:
       - id: ruff-check
         args: ["--fix"]
-        files: ^(src|tests)/
+        files: ^(src|tests|reproduce)/
       - id: ruff-format
-        files: ^(src|tests)/
+        files: ^(src|tests|reproduce)/
 
 # Strip Jupyter notebook output before commit.
 #   - repo: https://github.com/kynan/nbstripout
