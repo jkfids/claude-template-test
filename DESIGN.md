@@ -486,10 +486,9 @@ One rule: **does a researcher *using* the framework need it, or only someone
 and stubs. Template-repo-only: `DESIGN.md`, the template's root README,
 `.github/assets/` (the Stemma logo — note `.github/workflows/` travels),
 `.stemma/init/` (instantiation templates, consumed at init), `.stemma/tests/`,
-and `init.sh` itself. So `.stemma/` travels *except* `DESIGN.md`, `init/`, and
-`tests/`. This list is authoritative and `init.sh` implements it; the previous
-arrangement kept a second copy in the stub's comments and the two drifted within
-days.
+and `init.sh` itself. So `.stemma/` travels *except* `init/` and `tests/`.
+This list is authoritative and `init.sh` implements it; the previous arrangement
+kept a second copy in the stub's comments and the two drifted within days.
 
 ## 10. Open questions (for the pilot)
 

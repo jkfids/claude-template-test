@@ -9,5 +9,5 @@
 
 set -euo pipefail
 
-echo "init.sh is not implemented — see .stemma/DESIGN.md §9."
+echo "init.sh is not implemented — see DESIGN.md §9."
 exit 1
