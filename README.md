@@ -17,7 +17,8 @@ platforms.
 ## TO DO
 - `init.sh` is a stub—instantiate by hand or via AI.
 - No `.stemma/` scripts. `export.sh` is unwritten, so the export boundary has
-  no mechanism, and nothing checks that Release avoids non-exported paths.
+  no mechanism, and no `check_zones.py` script checking that Release avoids
+  non-exported paths.
 - No framework tests: instantiation, export safety, agent world-state.
 - No Stemma-native skills. `new-investigation` is unwritten; the four installed
   skills are borrowed and vendored unmodified.

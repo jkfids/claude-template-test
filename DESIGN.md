@@ -1,23 +1,16 @@
 # DESIGN.md — Stemma: an AI-assisted research monorepo template
 
-> **Status: living design document, exploratory.** This repository is a
-> domain-agnostic *template* for AI-assisted academic research. The design
-> below is high-level on purpose: structural commitments are minimal and
-> provisional — the repository's shape, including the investigation
-> structure, is a current working form, not a settled one. Most mechanics
-> are deliberately left as open questions to be settled by piloting the
-> template against a real project and feeding findings back here.
->
-> This file documents the *template's* design and is a template-development
-> artifact: it lives in the Stemma repository and does not travel into
-> instantiated projects (§9). A project's own overview lives in `PROJECT.md`;
-> a project's own decision log lives in `research/DECISIONS.md`.
->
 > **This is a logbook, not a specification.** The shipped files are the source
-> of truth: `AGENTS.md` and the directory READMEs govern behaviour, and where
-> this document disagrees with them, they win and this document is stale. Read
-> it for reasoning and history — why a choice was made, what was rejected, what
-> is still open — not for the current rules.
+> of truth: `AGENTS.md` and the directory READMEs govern behaviour, and the root
+> README's TO DO states what is currently unbuilt. Where this document disagrees
+> with them, they win and it is stale. Read it for reasoning — why a choice was
+> made, what was rejected, what is still open.
+>
+> Structural commitments are minimal and provisional; the repository's shape,
+> including the investigation structure, is a working form to be settled by
+> piloting against a real project. This file is a template-development artifact
+> and does not travel into instantiated projects (§9): a project's own overview
+> lives in `PROJECT.md`, its decision log in `research/DECISIONS.md`.
 
 ## 1. Purpose
 
@@ -46,10 +39,13 @@ directories live; `.agents/skills/` is a cross-client convention rather than a
 requirement, and Claude Code discovers skills only under `.claude/skills/`.
 `AGENTS.md` has the same shape of problem: Claude Code reads `CLAUDE.md`, not
 `AGENTS.md`. So the canonical files stay portable and each client gets a bridge
-— an `@AGENTS.md` import, and a symlink or copy for skills — generated at
-instantiation (§8). Symlinks make Unix the supported target; Windows needs
-Administrator or Developer Mode and silently checks a symlink out as a text
-file containing its target path, which fails invisibly.
+— an `@AGENTS.md` import, and a symlink for skills. Both are currently shipped
+in the template rather than generated at instantiation (§8), which is expedient
+rather than principled. Verified: Claude Code does follow a symlinked
+`.claude/skills`, so the bridge can stay a symlink and `.agents/skills/` remains
+the single source. Symlinks make Unix the supported target; on Windows git
+checks a symlink out as a text file containing its target path, which fails
+invisibly.
 
 Development loop: design the template here → instantiate it in a real project →
 run real work through it → return findings → revise.
@@ -255,26 +251,10 @@ recognisable endpoint crystallizes. Investigations mark *work, not intentions*:
 they are created when substantive work begins, never automatically from
 conversations or merely because a question exists.
 
-  This replaces an earlier framing built entirely around answering a question,
-  which would have disqualified the pilot's own first investigation — a survey
-  of a method's variants — before it started. Survey and orientation work is a
-  first-class investigation type, not a lesser one.
-
-  The lifecycle is deliberately light — one gate, at the end.
-  `research/investigations/README.md` owns these conventions; this summarises.
-
-  1. **Charter.** Branch from `main`, copy `_template/`, fill the README
-     (objective, scope, completion criterion), push, and open a **draft PR**.
-     Names are short hyphenated titles, undated, unique for the life of the
-     project.
-  2. **Work.** Direct commits on the branch, no ceremony. Keep the README's
-     current state up to date and steer the science in `ANALYSIS.md`;
-     `REPORT.md` may be drafted as sections stabilise but never leads —
-     claims appear in the analysis first. If the objective itself changes,
-     close and start a new investigation.
-  3. **Close.** Complete `REPORT.md`, add the resulting updates to the memory
-     files, and mark the draft PR ready. **The human merges, and the merge is
-     the acceptance.** After close, the dossier changes only by PR.
+  The lifecycle — charter, work, close — is deliberately light: one gate, at
+  the end, where the human merges and the merge is the acceptance.
+  `research/investigations/README.md` owns the steps; only the reasoning is
+  here.
 
   The draft PR does the work a registry file would: it makes in-flight
   investigations visible on `main`'s pull request list, gives collaborators a
@@ -304,8 +284,12 @@ is the failure mode neither party sees from inside — was drafted into
 `AGENTS.md` and cut for length; whether its absence is felt is a pilot
 question (§10).
 - **Export is a fail-closed allowlist**; nothing in Release may depend on
-anything not exported (the one silently-violated invariant; mechanically
-checked by `check_zones.py`). Manuscript is a self-contained TeX root: figures
+anything not exported. This is the one silently-violated invariant — nothing
+fails locally, CI stays green, and it surfaces only at export — and it is
+currently enforced by nothing: `check_zones.py` is written but unshipped, on
+the grounds that the pilot had no evidence to offer it. Its trigger is the
+first Release file found referencing a non-exported path. Manuscript is a
+self-contained TeX root: figures
 are generated by `reproduce/` and committed to `manuscript/figures/` so it
 compiles alone (Overleaf, arXiv submission).
 - **Release READMEs** are templates: fixed conventions plus HTML-comment prompts,
@@ -316,10 +300,10 @@ They exist where a directory needs orienting — `data/`, `reproduce/` — not b
 default: `manuscript/` ships source (`main.tex`, `references.bib`, `figures/`)
 and no README, since LaTeX source explains itself to its reader and the export
 would only delete it.
-- **Linting follows the code, as an allow-list.** Ruff runs on `src/` and
-`tests/` only; a new directory of Python is never linted until deliberately
-added. This needs both halves — `include` in `pyproject.toml` (governs
-`ruff check .` and editors) and `files:` on the pre-commit hooks (governs the
+- **Linting follows the code, as an allow-list.** Ruff runs on `src/`,
+`tests/`, and `reproduce/`; a new directory of Python is never linted until
+deliberately added. This needs both halves — `include` in `pyproject.toml`
+(governs `ruff check .` and editors) and `files:` on the pre-commit hooks (the
 commit path): `include` does not constrain paths passed explicitly, and
 pre-commit always passes them explicitly. The rule set favours correctness
 over style, since the formatter owns layout: `E4/E7/E9` rather than all of
@@ -364,14 +348,19 @@ modify its internals in an instantiated project.
 
 ```
 .stemma/
-  README.md            # the framework's own readme (what this layer is)
-  export.sh            # Release → fresh repo; verify; stop before pushing
-  check_zones.py       # Release must not depend on non-exported paths
+  DESIGN.md            # this file — TEMPLATE-REPO-ONLY (§9)
   init/                # instantiation templates, rendered once at init:
     README.md          #   → root README.md (project/companion README)
-    CITATION.cff       #   structured fill-in metadata
-  tests/               # framework tests — TEMPLATE-REPO-ONLY (§8)
+    CITATION.cff       #   not yet written
+  README.md            # not yet written — the framework's own readme
+  export.sh            # not yet written — Release → fresh repo; verify
+  check_zones.py       # not yet written — Release must not depend on
+                       #   non-exported paths
+  tests/               # not yet written — TEMPLATE-REPO-ONLY (§9)
 ```
+
+Only `DESIGN.md` and `init/README.md` exist; the root README's TO DO is
+authoritative on what is unbuilt.
 
 Flat until the script count warrants subdirectories. **Template taxonomy —
 form follows instance shape:** *instantiation templates* (rendered once) live under
@@ -385,10 +374,17 @@ and prompts baked in. LICENSE is none of these — a canonical legal text
 skeleton (legal-text drift is not "close enough").
 
 **Agent instruction, three tiers:** `AGENTS.md` the sparse router; then skills,
-the procedures (v0.1: `new-investigation` — artifact-producing, hence
-world-state-testable); then `.claude/`, the vendor remainder. Facts sort by
-scope: everywhere → AGENTS.md; named-task procedure → skill; this-directory-only
-→ its README; and each memory file's own contract governs itself.
+the procedures; then `.claude/`, the vendor remainder. Facts sort by scope:
+everywhere → AGENTS.md; named-task procedure → skill; this-directory-only →
+its README; and each memory file's own contract governs itself.
+
+No Stemma-native skill has been written. `new-investigation` was the intended
+first — artifact-producing, hence world-state-testable (§7) — but chartering by
+hand during the pilot is what will show which parts want automating. What ships
+instead is four third-party skills vendored unmodified, which tests the skills
+*mechanism* without committing to a procedure. `.claude/` holds only the skills
+symlink; its other candidate jobs (merge permissions, disabling client-side
+memory) wait on evidence.
 
 `AGENTS.md` shipped at ~70 lines: a framing line, a two-file entry point, the
 three zones with their export boundary and links to the owning READMEs, the
@@ -446,31 +442,55 @@ output-is-a-diff makes these workflows testable without an LLM judge.
 ## 8. Instantiation
 
 The template ships as a working package `project_name` (import) /
-`project-name` (distribution) so it builds pre-instantiation. `init.sh` (root,
-run-once) renames both forms — different strings, separate substitutions —
-across `pyproject.toml`, `src/`, and the smoke test; fills metadata; renders
-`.stemma/init/` (project README → root, replacing the template's own README,
-which never travels); writes the stamped LICENSE; installs pre-commit; then
-greps for surviving
-`project_name`/`project-name`/`{{...}}` and warns — CI cannot catch a
-wrong-but-consistent rename. Checklist includes enabling branch protection on
-`src/`/`tests/`.
+`project-name` (distribution) so it builds pre-instantiation. `init.sh` is a
+stub; instantiation is by hand for now, which is the spec's dry run. The spec
+follows, since the stub no longer carries it.
+
+1. **Gather** — project name, description, author name/email, org/user;
+   defaults from the directory name and `git config user.name`/`user.email`.
+   Support a non-interactive form (`PROJECT_NAME=… ./init.sh --yes`) so the
+   instantiation test (§7) can drive it.
+2. **Derive and validate** — hyphen form (distribution) and underscore form
+   (package) are *different strings*, substituted separately, longest-first.
+   Validate that the underscore form is a legal Python identifier and the
+   hyphen form a legal PEP 508 name: a wrong-but-consistent rename is the one
+   failure CI cannot catch.
+3. **Rename** — in `pyproject.toml`: `name`, `packages`, the dynamic-version
+   path to `__about__.py`, `authors`, `description`, `[project.urls]`. On disk:
+   `git mv src/project_name/`. In `tests/test_smoke.py`: the import.
+4. **Render** — `.stemma/init/README.md` → root `README.md`, substituting
+   `{{PROJECT_NAME}}`, `{{DESCRIPTION}}`, `{{AUTHOR}}`, `{{ORG}}`. Likewise
+   `CITATION.cff` and a stamped LICENSE when those templates exist; until they
+   do, the rendered README links to two files that will not be there.
+5. **Delete** the template-only paths (§9) — including itself.
+6. **Environment** — `pip install -e ".[dev]"`, then `pre-commit install`.
+7. **Verify** — grep for surviving `project_name`, `project-name`, `{{…}}`;
+   warn loudly rather than failing silently.
+8. **Report** — fill `PROJECT.md`; review `pyproject.toml`; enable branch
+   protection on `src/`/`tests/`; commit; read `research/README.md`.
+
+Prefer `python3` over `sed` for the substitutions: user input contains slashes,
+ampersands, and quotes, and `sed -i` differs between GNU and BSD. Since the work
+is mostly string handling and validation, the implementation is likely Python
+despite the `.sh` name.
 
 Instantiation configures the research project, not a permanent AI stack. It
 does not pin a model, agent tool, or work surface: those remain user- and
-task-level choices. Client adapters may be detected or generated, but canonical
-rules stay in the portable layer and personal credentials stay outside the
-repository.
+task-level choices. Client adapters may be detected or generated — currently
+they are shipped in the template instead (§1) — but canonical rules stay in the
+portable layer and personal credentials stay outside the repository.
 
 ## 9. Template-only vs travelling
 
 One rule: **does a researcher *using* the framework need it, or only someone
-*developing* it?** Travels: `.stemma/` tools, templates, docs, its README; all
-zone content and stubs. Template-repo-only: `DESIGN.md`, the template's root
-README, `.github/assets/` (the Stemma logo — note `.github/workflows/`
-travels), `.stemma/init/` (instantiation templates, consumed at init), and
-`.stemma/tests/`. `init.sh` owns this list and deletes each path. The tools
-travel; the tools' tests do not.
+*developing* it?** Travels: `.stemma/` tools and their docs; all zone content
+and stubs. Template-repo-only: `.stemma/DESIGN.md`, the template's root README,
+`.github/assets/` (the Stemma logo — note `.github/workflows/` travels),
+`.stemma/init/` (instantiation templates, consumed at init), `.stemma/tests/`,
+and `init.sh` itself. So `.stemma/` travels *except* `DESIGN.md`, `init/`, and
+`tests/`. This list is authoritative and `init.sh` implements it; the previous
+arrangement kept a second copy in the stub's comments and the two drifted within
+days.
 
 ## 10. Open questions (for the pilot)
 
@@ -518,45 +538,46 @@ non-coder entry points; the md→PDF render path for reports.
 - Do the LaTeX conventions (one-sentence-per-line, self-contained TeX root)
 need a traveling home, or does the manuscript's own shape teach them?
 - Does the portable extension layer work across clients without duplicated
-policy? The format is portable and the location is not (§1); the open part is
-whether a generated bridge is enough, and whether v0.1 needs one paved
-reference client or only compatibility checks. Verify at scaffold time that a
-symlinked skills directory is actually discovered.
+policy? The format is portable and the location is not (§1). Answered so far:
+Claude Code follows a symlinked `.claude/skills`, so one symlink suffices for
+that client. Open: whether a second client needs more than a symlink, and
+whether the bridge should ship in the template or be generated at init.
+- Vendored third-party skills have no pinned upstream commit, so a local edit
+and an upstream release are indistinguishable. Two of four drifted within days
+of vendoring. Does a provenance record earn its place, or is re-pulling
+deliberately before each investigation enough?
 - Client-side memory features write an unreviewed record outside the
 repository, parallel to the one this design makes reviewable (P1, P2). Disable
 by default in `.claude/`, or does it prove useful enough to keep and ignore?
 
 ## 11. v0.1 scope
 
-The tree above with its stubs (five memory files plus `PROJECT.md` in house
-style; the zone README as map and gate; investigation `_template/` —
-`README.md`, `ANALYSIS.md`, `REPORT.md`, deliberately minimal: contract
-blockquotes plus prompts, structure otherwise free — with conventions and
-lifecycle in `investigations/README.md`; literature and meeting templates
-embedded in their directory READMEs; Release READMEs for `data/` and
-`reproduce/`; a manuscript skeleton — `main.tex`, `references.bib`,
-`figures/` — compiling standalone), pre-commit + CI green on the shipped
-package, a sparse `AGENTS.md` (§6), `CLAUDE.md` importing it, and one skill
-(`new-investigation`). Stub `export.sh`/`init.sh` carry their spec in comments.
-No framework tests yet. No log file, no render script, no fixed report
-skeleton, no `write-up` — each deferred with a named trigger (§5, §10).
+Shipped: the tree above with its stubs (five memory files plus `PROJECT.md`
+in house style; the zone README as map and gate; investigation `_template/`,
+deliberately minimal — contract blockquotes plus prompts, structure otherwise
+free; literature and meeting templates embedded in their directory READMEs;
+Release READMEs for `data/` and `reproduce/`; a manuscript skeleton compiling
+standalone), pre-commit + CI green on the shipped package, `AGENTS.md` (§6),
+`CLAUDE.md` importing it, and four vendored third-party skills.
 
-Cut or deferred out of the earlier v0.1 list, all for the same reason — the
-pilot cannot exercise them, so building them would return no evidence:
+**The root README's TO DO is authoritative on what is unbuilt.** What follows
+is only why, since status drifts and reasoning does not. Almost everything
+deferred shares one criterion — *the pilot cannot exercise it, so building it
+returns no evidence*: `check_zones.py` (written but unshipped; trigger in §5),
+`new-investigation` (chartering by hand shows what wants automating),
 `add-source` (its shape depends on how literature intake settles, so building
-it first means building it twice); `check_zones.py` (it guards Release against
-depending on non-exported paths, and a literature-heavy investigation touches
-neither side of that boundary); `.claude/` contents (three candidate jobs
-identified — merge permissions, a skills bridge, disabling client-side memory —
-none yet confirmed); and `init.sh` (instantiate by hand once, which is the
-spec's dry run and will produce a better script).
+it first means building it twice), `.claude/` contents beyond the symlink,
+framework tests, and `init.sh` — where instantiating by hand is itself the
+spec's dry run. No log file, no render script, no fixed report skeleton, no
+`write-up`: each has a named trigger (§5, §10).
 
-**Before tagging v0.1:** implement `init.sh` against its spec; scope the
-cosmetic hygiene hooks (`trailing-whitespace`, `end-of-file-fixer`) away from
-`research/` — deferred so the template's own files stay clean while it is the
-product; fill the root README's empty sections with one concrete end-to-end
-walkthrough — written *from* the pilot rather than before it, since the
-walkthrough written today would be the one imagined rather than the one run.
+**Before tagging v0.1:** implement `init.sh` against §8; write `export.sh`,
+without which the export boundary is a claim rather than a mechanism; add the
+`LICENSE` and `CITATION.cff` templates the rendered README already links to;
+scope the cosmetic hygiene hooks away from `research/` — deferred so the
+template's own files stay clean while it is the product; and fill the root
+README's empty sections with one concrete end-to-end walkthrough, written
+*from* the pilot rather than before it.
 
 **Pilot:** run one real bounded investigation end to end — charter, draft PR,
 literature, analysis, report, merge, FINDINGS and QUESTIONS updates. Log what
@@ -566,35 +587,34 @@ extending this document.
 
 ---
 
-*Changes from the prior draft.* **Status:** this document is demoted to a
-logbook. The shipped files govern; where this disagrees with them it is stale
-(header).
+*Changes from the prior draft.* **Status.** Demoted to a logbook: the shipped
+files govern, and the root README's TO DO — not §11 — is authoritative on what
+is unbuilt. §11 keeps only the reasoning. Two overlapping status paragraphs in
+the header merged into one.
 
-**Investigations:** the charter test no longer requires a question. An
+**Investigations.** The charter test no longer requires a question. An
 investigation states an **objective** and a **completion criterion**, and
 orientation or survey work qualifies when the criterion states the ground to be
 covered. The prior framing — "could you recognise an answer if you saw one",
 with anything else sent to `notes/` — would have disqualified the pilot's own
 first investigation. Vocabulary changed throughout: *answer criterion* →
 *completion criterion*, *question* → *objective* where the charter is meant
-(§4, §5, §7). The restart trigger is a changed objective, not a changed scope,
-since scope narrows routinely.
+(§4, §5, §7). The restart trigger is a changed objective, not a changed scope.
+The lifecycle steps were cut from §5, which was restating what
+`investigations/README.md` owns.
 
-**Agent instruction:** `AGENTS.md` shipped, and §6 now records why it has the
-shape it does rather than specifying it — no repository tree, no precedence
-ladder, prohibitions paired with actions, rationale only where it aids
-generalisation, commands only where non-obvious. Provider neutrality is
-qualified: the skills *format* is portable but the *location* is not, so
-canonical files stay portable and clients get a generated bridge, which makes
-Unix the supported target (§1, §3, §6, §8). Noted that instruction files are
-context rather than enforcement, so the never-merge rule's durable form is a
-client permission rule (§6).
+**Agent instruction.** `AGENTS.md` shipped; §6 now records why it has the shape
+it does rather than specifying it. Provider neutrality is qualified: the skills
+*format* is portable, the *location* is not, and Claude Code is confirmed to
+follow a symlinked `.claude/skills` (§1, §10). Instruction files are context
+rather than enforcement, so the never-merge rule's durable form is a client
+permission rule (§6). No Stemma-native skill was written; four third-party
+skills ship vendored instead, which tests the mechanism without committing to a
+procedure.
 
-**Literature:** citekey provenance has an owner — keys come from the
-bibliography and are never invented (`literature/README.md`). Source PDFs are
-untracked; the notes are the durable record (§5).
-
-**Scope:** `add-source`, `check_zones.py`, `.claude/` contents, and `init.sh`
-are deferred out of v0.1 on one shared criterion — the pilot cannot exercise
-them, so building them returns no evidence. `CLAUDE.md` is added, since without
-it `AGENTS.md` is inert in Claude Code (§11).
+**Corrections.** `check_zones.py` was described as enforcing the export
+invariant; it does not exist, and §5 now says so and names its trigger. Ruff's
+scope is `src`, `tests`, `reproduce`. `DESIGN.md` moved to `.stemma/`, and §9
+now carves it out of the travelling set. The `init.sh` spec moved from the
+stub's comments into §8 — the two copies had already drifted, which is the
+argument for one owner.
