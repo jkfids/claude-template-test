@@ -348,7 +348,6 @@ modify its internals in an instantiated project.
 
 ```
 .stemma/
-  DESIGN.md            # this file — TEMPLATE-REPO-ONLY (§9)
   init/                # instantiation templates, rendered once at init:
     README.md          #   → root README.md (project/companion README)
     CITATION.cff       #   not yet written
@@ -484,7 +483,7 @@ portable layer and personal credentials stay outside the repository.
 
 One rule: **does a researcher *using* the framework need it, or only someone
 *developing* it?** Travels: `.stemma/` tools and their docs; all zone content
-and stubs. Template-repo-only: `.stemma/DESIGN.md`, the template's root README,
+and stubs. Template-repo-only: `DESIGN.md`, the template's root README,
 `.github/assets/` (the Stemma logo — note `.github/workflows/` travels),
 `.stemma/init/` (instantiation templates, consumed at init), `.stemma/tests/`,
 and `init.sh` itself. So `.stemma/` travels *except* `DESIGN.md`, `init/`, and
