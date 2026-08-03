@@ -14,3 +14,7 @@
 research/**/*.md  linguist-documentation
 research/**/*.tex linguist-documentation
 manuscript/**     linguist-documentation
+
+# Agent skills are potentially third-party.
+.agents/**        linguist-vendored
+.claude/**        linguist-vendored

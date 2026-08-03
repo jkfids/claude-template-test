@@ -42,6 +42,9 @@ dev = ["pytest>=9", "ruff>=0.16", "pre-commit>=4",]
 [tool.hatch.build.targets.wheel]
 packages = ["src/project_name"]
 
+[tool.hatch.build.targets.sdist]
+only-include = ["src", "tests", "data", "reproduce"]
+
 # For dynamic versioning, replace `version = "..."` with `dynamic = ["version"]` under [project],
 # and uncomment the two lines below (with __about__.py containing: __version__ = "0.1.0").
 # [tool.hatch.version]

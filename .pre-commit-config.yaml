@@ -11,6 +11,9 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
+      # On project initialization, replace the `exclude` regex below with the
+      # following:
+      #   files: '^([^/]+|(src|tests|data|reproduce|\.github)/.*)$'
       - id: trailing-whitespace  # Remove trailing whitespace
         args: [--markdown-linebreak-ext=md]
         exclude: ^\.agents/skills/
