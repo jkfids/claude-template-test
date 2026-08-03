@@ -24,6 +24,11 @@ pull request.
   and verify them in place, but commit them on a separate branch off `main`,
   then merge (rather than rebase) `main` back into the investigation branch.
 - A human merges the closing pull request—the merge is the acceptance.
+- Prefer flat investigation directories; add subdirectories (`figures/`,
+  `data/`) only once files accumulate.
+- Results quoted in `ANALYSIS.md` and `REPORT.md` trace to scripts in the
+  investigation directory, runnable from the repository root; fix and record
+  any seeds.
 
 ## Lifecycle
 

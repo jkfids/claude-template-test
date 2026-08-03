@@ -25,7 +25,8 @@
 ## Current state
 
 <!-- Briefly describe what has been completed, what remains, and any blocker.
-     Do not duplicate the detailed analysis. -->
+     Do not duplicate the detailed analysis. At close, replace with a short
+     summary of the outcome. -->
 
 ## Directory
 
