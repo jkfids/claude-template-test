@@ -136,6 +136,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = LiteParse(
         ocr_enabled=not args.no_ocr,
         output_format=args.format,
+        extract_text_metadata=args.format == "json",
         quiet=args.quiet,
     )
 

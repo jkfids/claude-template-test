@@ -229,6 +229,8 @@ def validate_against_plan(
             )
         ):
             dpi_status = "fail"
+        elif dpi_rule.get("target") is not None:
+            dpi_status = "review"
         else:
             dpi_status = "pass"
         findings.append(
@@ -241,6 +243,10 @@ def validate_against_plan(
                     "Calculated at the selected final width when supplied; "
                     "otherwise uses embedded DPI metadata. Upsampling is not "
                     "evidence of added detail."
+                    + (
+                        " Approximate DPI targets require manual review."
+                        if dpi_rule.get("target") is not None else ""
+                    )
                 ),
             )
         )
@@ -315,18 +321,23 @@ def validate_against_plan(
 
     pixel_range = plan.get("width_range_px_at_300_dpi")
     if pixel_range and metadata.get("width_px") is not None:
-        actual_width_px = int(metadata["width_px"])
+        actual_width_px = (
+            round(effective_width / 25.4 * 300)
+            if effective_width is not None else None
+        )
         findings.append(
             _finding(
                 "pixel_width_snapshot",
                 (
-                    "pass"
-                    if int(pixel_range[0]) <= actual_width_px <= int(pixel_range[1])
-                    else "fail"
+                    "unknown" if actual_width_px is None else (
+                        "pass"
+                        if int(pixel_range[0]) <= actual_width_px <= int(pixel_range[1])
+                        else "fail"
+                    )
                 ),
                 actual=actual_width_px,
                 expected={"min": pixel_range[0], "max": pixel_range[1]},
-                detail="This publisher expresses its width range at 300 dpi.",
+                detail="Physical width converted to the nearest pixel at 300 dpi.",
             )
         )
 
