@@ -108,10 +108,18 @@ These were checked during the September 2026 review.
 
 Keep repository-specific procedures local; obtain general tools from personal
 collections or plugins where practical. Vendored skills need license and
-upstream provenance. The September audit retained `liteparse` and `paper-lookup`, with upstream
-revisions recorded in their metadata and licenses preserved. LiteParse now uses
-the native batch CLI and upstream manuals; the paper pager has regression tests
-for credential redaction, pagination bounds and malformed responses.
+upstream provenance. Start updates from current upstream, preserving its
+entrypoints, references, and helpers; reapply only justified local fixes.
+References load on demand, so deleting them does not inherently save context.
+
+The bundled skills are `liteparse`, `paper-lookup`, `scientific-visualization`,
+and `sympy`, pinned to upstream revision `330c8e7` in their metadata. Local
+changes address pager redaction and completeness, sparse abstract indexes,
+current OpenAlex and LiteParse behavior, batch output collisions, runnable
+plotting/math examples, and mathematical assumptions. Citation suggestions
+follow the reference-manager workflow instead of editing generated bibliographies.
+Licenses are retained; `.stemma/tests/` checks the affected tools.
+
 `skill-creator` was a large client-specific development toolkit;
 `verification-before-completion` duplicated contribution guidance. Both were
 removed from the template. Avoid adding a catalog or orchestrator merely because

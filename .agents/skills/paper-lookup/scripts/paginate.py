@@ -1,7 +1,28 @@
 #!/usr/bin/env python3
-"""Bounded pagination with count reconciliation for five scholarly APIs.
+"""Bounded, rate-limited, count-reconciling pagination for this skill's APIs.
 
-Run --list-apis for query formats. Uses the standard library and network access.
+The five APIs supported here paginate differently -- absolute record offsets,
+opaque cursors, continuation tokens, 1-based pages -- and each reports totals its
+own way. Re-deriving the walk per query is how records get silently dropped. The
+worst case is bioRxiv: `cursor` is an absolute offset, `/details/` returns 30 per
+page but `/pubs/` returns 100, and an out-of-step cursor returns **HTTP 200**, so
+stepping by 100 skips records 30-99 of every hundred and looks successful.
+
+Every walk here:
+
+- steps by the page size the response actually reported, never an assumed one
+- stops on this API's real terminator (Europe PMC echoes your cursor back rather
+  than sending null; bioRxiv just returns an empty collection)
+- reconciles retrieved against the expected total and **exits 4 on a shortfall**
+- refuses to exceed --max-records / --max-calls, and says so rather than
+  truncating quietly
+
+    python3 paginate.py --api biorxiv --query 2024-01-01/2024-01-03
+    python3 paginate.py --api europepmc --query 'SRC:"PPR" AND "organoid"' --max-records 200
+    python3 paginate.py --api openalex --query 'filter=publication_year:2024' --dry-run
+
+Needs network access. No credentials required for bioRxiv, medRxiv, Europe PMC,
+Crossref, or OpenAlex; OPENALEX_API_KEY raises the OpenAlex usage budget.
 """
 
 from __future__ import annotations
@@ -22,7 +43,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _common import Reconciliation, emit, fail, redact_url  # noqa: E402
 
-USER_AGENT = "paper-lookup-skill/2.1 (+https://agentskills.io)"
+USER_AGENT = "paper-lookup-skill/2.0 (+https://agentskills.io)"
 DEFAULT_MAX_RECORDS = 1000
 DEFAULT_MAX_CALLS = 50
 REQUEST_TIMEOUT = 60
