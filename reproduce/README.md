@@ -1,12 +1,15 @@
-# reproduce
+# Reproduction
 
-Scripts and tools for regenerating the paper's results and figures.
+Scripts for the paper's results and figures. Write generated figures to
+`manuscript/figures/`; use only code and data included in the release.
 
-It is recommended to write at least one script per figure or result. Generated
-manuscript figures should be written directly to `manuscript/figures/`.
+Document each result's command, working directory, inputs, outputs, seeds, and
+resolved environment. Declare dependencies in `pyproject.toml`; record the
+source revision, immutable Git dependency revisions, and any local changes.
 
-Scripts may import from `data/` and `src/`. Nothing in `reproduce/` may import
-from or depend on `research/`, or anything else that is not exported.
+Separate figure regeneration from full simulation. For expensive runs, give
+runtime and hardware requirements, scheduler settings where applicable, and a
+small validation command. Verify the documented commands in a clean release
+checkout, without private research files or sibling repositories.
 
-<!-- Script documentation, e.g.:
-     reproduce/experiment1.py  ->  manuscript/figures/experiment1_figure.pdf -->
+<!-- Commands and output paths, grouped by figure or result. -->

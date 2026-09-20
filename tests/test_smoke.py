@@ -1,4 +1,7 @@
-def test_import():
-    import project_name  # noqa: F401
+from importlib.metadata import version
 
-    assert project_name is not None
+import project_name
+
+
+def test_package_version():
+    assert version("project-name") == project_name.__version__

@@ -580,6 +580,11 @@ research/literature/**/*.pdf
 CLAUDE.local.md
 .claude/settings.local.json
 .claude/*.local.json
+# Local agent worktrees and environment files; shared config remains tracked.
+.worktrees/
+.claude/worktrees/
+.env.*
+!.env.example
 # Other
 .cursor/rules/*.local.mdc
 .aider*

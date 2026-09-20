@@ -1,28 +1,7 @@
 #!/usr/bin/env python3
-"""Bounded, rate-limited, count-reconciling pagination for this skill's APIs.
+"""Bounded pagination with count reconciliation for five scholarly APIs.
 
-Six of the ten databases here paginate differently -- absolute record offsets,
-opaque cursors, continuation tokens, 1-based pages -- and each reports totals its
-own way. Re-deriving the walk per query is how records get silently dropped. The
-worst case is bioRxiv: `cursor` is an absolute offset, `/details/` returns 30 per
-page but `/pubs/` returns 100, and an out-of-step cursor returns **HTTP 200**, so
-stepping by 100 skips records 30-99 of every hundred and looks successful.
-
-Every walk here:
-
-- steps by the page size the response actually reported, never an assumed one
-- stops on this API's real terminator (Europe PMC echoes your cursor back rather
-  than sending null; bioRxiv just returns an empty collection)
-- reconciles retrieved against the expected total and **exits 4 on a shortfall**
-- refuses to exceed --max-records / --max-calls, and says so rather than
-  truncating quietly
-
-    python3 paginate.py --api biorxiv --query 2024-01-01/2024-01-03
-    python3 paginate.py --api europepmc --query 'SRC:"PPR" AND "organoid"' --max-records 200
-    python3 paginate.py --api openalex --query 'filter=publication_year:2024' --dry-run
-
-Needs network access. No credentials required for bioRxiv, medRxiv, Europe PMC,
-Crossref, or OpenAlex; NCBI_API_KEY and S2_API_KEY raise limits where relevant.
+Run --list-apis for query formats. Uses the standard library and network access.
 """
 
 from __future__ import annotations
@@ -43,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _common import Reconciliation, emit, fail, redact_url  # noqa: E402
 
-USER_AGENT = "paper-lookup-skill/2.0 (+https://agentskills.io)"
+USER_AGENT = "paper-lookup-skill/2.1 (+https://agentskills.io)"
 DEFAULT_MAX_RECORDS = 1000
 DEFAULT_MAX_CALLS = 50
 REQUEST_TIMEOUT = 60
@@ -78,14 +57,13 @@ def fetch(url: str, *, headers: dict[str, str] | None = None) -> Any:
         with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT) as response:
             body = response.read().decode("utf-8", errors="replace")
     except urllib.error.HTTPError as error:
-        detail = error.read().decode("utf-8", errors="replace")[:400]
-        raise RuntimeError(f"HTTP {error.code} from {url}: {detail}") from error
-    except urllib.error.URLError as error:
-        raise RuntimeError(f"could not reach {url}: {error.reason}") from error
+        raise RuntimeError(f"HTTP {error.code} from {redact_url(url)}") from None
+    except urllib.error.URLError:
+        raise RuntimeError(f"could not reach {redact_url(url)}") from None
     try:
         return json.loads(body)
-    except json.JSONDecodeError as error:
-        raise RuntimeError(f"response from {url} was not JSON: {error}; first 200 bytes: {body[:200]}")
+    except json.JSONDecodeError:
+        raise RuntimeError(f"response from {redact_url(url)} was not JSON") from None
 
 
 # --- bioRxiv / medRxiv ------------------------------------------------------
@@ -199,10 +177,7 @@ def _openalex_url(query: str, state: Any, limit: int) -> str:
     # `query` is a raw parameter string, e.g. `search=crispr` or
     # `filter=publication_year:2024`, so both forms work without a second flag.
     base = "https://api.openalex.org/works?"
-    params = {"per-page": str(min(limit, 200)), "cursor": str(state)}
-    mail = os.environ.get("OPENALEX_EMAIL")
-    if mail:
-        params["mailto"] = mail
+    params = {"per-page": str(min(limit, 100)), "cursor": str(state)}
     key = os.environ.get("OPENALEX_API_KEY")
     if key:
         params["api_key"] = key
@@ -212,8 +187,10 @@ def _openalex_url(query: str, state: Any, limit: int) -> str:
 def _openalex_parse(payload: Any, _state: Any) -> Page:
     if not isinstance(payload, dict):
         raise RuntimeError(f"expected a JSON object, got {type(payload).__name__}")
-    meta = payload.get("meta") or {}
-    records = payload.get("results") or []
+    if not isinstance(payload.get("meta"), dict) or not isinstance(payload.get("results"), list):
+        raise RuntimeError("OpenAlex response is missing meta or results")
+    meta = payload["meta"]
+    records = payload["results"]
     notes = []
     if meta.get("cost_usd") is not None:
         notes.append(f"OpenAlex reported cost_usd={meta['cost_usd']} for this call")
@@ -364,6 +341,7 @@ def walk(
 
     # Trim only after the walk, so the reported page count stays truthful.
     if len(records) > max_records:
+        reconciliation.stopped_at_limit = True
         reconciliation.note(
             f"last page overshot --max-records; kept the first {max_records} of {len(records)}"
         )
@@ -459,7 +437,10 @@ def main(argv: list[str] | None = None) -> int:
     emit(
         {
             "api": api.name,
-            "query": args.query,
+            "query": (
+                redact_url("https://query.invalid/?" + args.query).partition("?")[2]
+                if args.api in {"openalex", "crossref"} else args.query
+            ),
             "provenance": {"urls": urls, "delay_seconds": api.delay},
             "reconciliation": reconciliation.as_dict(),
             "records": records,

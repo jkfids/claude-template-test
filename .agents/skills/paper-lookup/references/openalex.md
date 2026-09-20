@@ -8,19 +8,15 @@ OpenAlex is a comprehensive index of 250M+ scholarly works, authors, institution
 https://api.openalex.org
 ```
 
-## Authentication
+## Access
 
-- **API key recommended** (free). Get one at https://openalex.org/settings/api
-- Pass as: `?api_key=YOUR_KEY`
-- Legacy polite pool still works: add `?mailto=you@example.com` for better rate limits
+Casual queries can run without a key. A free API key increases the usage budget;
+set `OPENALEX_API_KEY` for the bundled pager. Query parameters accept `api_key`;
+the API also supports bearer authentication. Keep keys out of saved provenance.
 
-## Rate Limits
-
-- **100 requests/second** max
-- Usage-based pricing with $1/day free allowance
-- Single entity lookups by ID/DOI are free (unlimited)
-- List + filter queries: ~$0.0001 each (~10,000/day free)
-- Search queries: ~$0.001 each (~1,000/day free)
+Consult [OpenAlex authentication](https://help.openalex.org/api/authentication/)
+for current access limits and pricing. Use at most 100 results per page and back
+off on HTTP 429.
 
 ## Key Endpoints
 
@@ -57,7 +53,10 @@ GET /works?search={query}&per_page={n}&page={n}
 | `select` | -- | Comma-separated fields to return |
 | `group_by` | -- | Aggregate by field |
 
-**Advanced search:** Supports wildcards (`machin*`), fuzzy (`machin~1`), proximity (`"climate change"~5`), boolean grouping.
+**Advanced search:** Wildcards (`machin*`) require `search.exact`; default
+`search` rejects them. Fuzzy (`machin~1`), proximity (`"climate change"~5`) and
+boolean grouping are also available. See the
+[search documentation](https://help.openalex.org/api/searching/) for syntax.
 
 **Example:**
 ```
@@ -150,15 +149,8 @@ Response includes `meta.next_cursor`. Pass it as `cursor={value}` in the next re
 
 ### Abstract inverted index
 
-Abstracts are stored as `{word: [positions]}`. To reconstruct:
-```python
-def reconstruct(inverted_index):
-    positions = {}
-    for word, indices in inverted_index.items():
-        for idx in indices:
-            positions[idx] = word
-    return ' '.join(positions[i] for i in sorted(positions.keys()))
-```
+Abstracts use `{word: [positions]}`. Use `scripts/openalex_abstract.py` to
+reconstruct them and detect missing positions or conflicting entries.
 
 ### List response
 

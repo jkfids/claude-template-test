@@ -7,17 +7,12 @@
 
 ## Overview
 
-<!-- Describe the project in a few sentences. State the subject of the research,
-     the central aim, the intended contribution, and what is out of scope. -->
+<!-- What the project studies, why it matters, and its intended contribution. -->
 
-## Background and motivation
+## Scope
 
-<!-- Explain the scientific or practical problem and why it matters. Identify
-     the limitation, gap, or opportunity that motivates the project—in a few
-     sentences. -->
+<!-- The questions or regimes covered, and what is outside the project. -->
 
 ## People
 
 <!-- Collaborators and roles. -->
-
-<!-- Add sections as needed: funding, timeline, related projects, key links. -->

@@ -1,9 +1,8 @@
-# data
+# Data
 
-Input data needed to reproduce the results, checked into git. Files over 5 MB
-are blocked by the pre-commit by default. It is recommended that large datasets
-are stored externally (e.g., archived on Zenodo); reference them below by DOI
-or path.
+Inputs and archived outputs needed to reproduce the results. Store files over
+5 MB externally and provide a stable download link, checksum, and local path.
 
-<!-- Describe this project's data: what each file/source is, and where any
-externally-hosted data lives (with DOIs). -->
+<!-- For each dataset: source/version, format, preprocessing, attribution, and
+     access conditions. Distinguish raw inputs from saved simulation outputs
+     used to regenerate figures. -->

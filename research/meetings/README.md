@@ -1,29 +1,19 @@
 # Meetings
 
-Curated records of project meetings. Each meeting has its own directory, with
-`README.md` as the authoritative record of what was discussed, decided, and
-assigned. Transcripts, slides, images, AI-generated summaries, and other
-supplemental material may live alongside it as raw material.
-
-## Conventions
-
-Name meeting directories `YYYY-MM-DD-short-title/`.
-
-## Meeting directory `README.md` template
+One directory per meeting, named `YYYY-MM-DD-short-title/`. Its `README.md`
+records the discussion and outcomes; source material lives alongside it.
 
 ```markdown
-# Meeting: <!-- short title -->
+# Meeting: <!-- title -->
 
 **Date:** <!-- YYYY-MM-DD -->
 
-<!-- Single-sentence description of the meeting. -->
-
 ## Notes
 
-<!-- What mattered, in brief. Point at artifacts rather than restating them. -->
+<!-- What mattered; link supporting artifacts. -->
 
 ## Outcomes
 
-<!-- Decisions, actions, and questions raised—route them onward: decisions to
-     `DECISIONS.md`, tasks to `STATUS.md`, questions to `QUESTIONS.md`. -->
+<!-- Actions and owners. Route tasks to STATUS.md, questions to QUESTIONS.md,
+     and proposed findings or decisions through the research review process. -->
 ```

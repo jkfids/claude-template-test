@@ -9,12 +9,14 @@
 
 ## Summary
 
-<!-- One or two sentences: the current focus and the why behind it. -->
+<!-- Current focus and why it matters. -->
 
-## Current tasks
+## Current state
 
-<!-- Bullet list of current tasks. -->
+<!-- Active work and manuscript entry point; link relevant branches or PRs.
+     Distinguish accepted results from provisional drafts. Name pending reviews
+     and blockers; keep detailed evidence in its owning record. -->
 
 ## Next
 
-<!-- Bullet list of queued tasks, in rough order. -->
+<!-- Prioritized next steps. Label proposed work whose scope is not agreed. -->

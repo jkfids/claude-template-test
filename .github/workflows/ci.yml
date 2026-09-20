@@ -1,8 +1,7 @@
 # ==============================================================================
 # ci.yml – Stemma (project CI)
 #
-# Tests the project's own code: installs the package across a Python matrix and
-# runs pytest, and separately runs the pre-commit hooks.
+# Tests editable and built installations; checks formatting and repository hygiene.
 # ==============================================================================
 
 name: CI
@@ -30,9 +29,16 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - name: Install
-        run: pip install -e ".[dev]"
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . --group dev
+      - name: Build and install wheel from sdist
+        if: matrix.python-version == '3.14'
+        run: |
+          python -m build
+          python -m pip install --force-reinstall dist/*.whl
       - name: Test
-        run: pytest
+        run: python -m pytest
 
   lint:
     runs-on: ubuntu-latest
@@ -40,5 +46,9 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
-      - uses: pre-commit/action@v3.0.1
+          python-version: "3.14"
+      - name: Check
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --group dev
+          pre-commit run --all-files
