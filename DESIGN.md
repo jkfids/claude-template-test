@@ -118,7 +118,9 @@ changes address pager redaction and completeness, sparse abstract indexes,
 current OpenAlex and LiteParse behavior, batch output collisions, runnable
 plotting/math examples, and mathematical assumptions. Citation suggestions
 follow the reference-manager workflow instead of editing generated bibliographies.
-Licenses are retained; `.stemma/tests/` checks the affected tools.
+Licenses are retained. These skills are replaceable conveniences, not intrinsic
+template functionality. Check local changes when updating them; ongoing skill
+test suites belong upstream.
 
 `skill-creator` was a large client-specific development toolkit;
 `verification-before-completion` duplicated contribution guidance. Both were

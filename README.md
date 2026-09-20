@@ -62,18 +62,9 @@ separate release artifacts.
 - **Ruff, pytest and pre-commit** provide the default checks. Optional notebook,
   shell and analysis tools are commented in the configuration; enable what the
   project uses. Scientific libraries are chosen by each project.
-- **Agent skills** cover literature lookup, document extraction, scientific
+- **Optional agent skills** cover literature lookup, document extraction, scientific
   figures, and symbolic mathematics. Shared instructions live in `AGENTS.md`;
   `.claude/skills` links to `.agents/skills`.
-
-## Template checks
-
-After [development setup](CONTRIBUTING.md#setup), run `python -m pytest .stemma/tests`
-for the tool regressions.
-Package checks are documented in [CONTRIBUTING.md](CONTRIBUTING.md#working-and-checking).
-
-Skill integration tests use LiteParse, Matplotlib, Pillow, and pypdf; they
-are skipped when those optional dependencies are missing.
 
 ## TO DO
 
