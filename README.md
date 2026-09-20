@@ -30,7 +30,7 @@ The manuscript and reusable code draw on that accepted work. See
 | --- | --- | --- |
 | **Release** | `src/`, `tests/`, `data/`, `reproduce/`, `manuscript/`, packaging and CI | [Development](CONTRIBUTING.md), [reproduction](reproduce/README.md) |
 | **Research** | Project definition, status, accepted knowledge, investigations, literature, notes and meetings | [PROJECT.md](PROJECT.md), [research/README.md](research/README.md) |
-| **Operations** | Agent instructions, shared skills, client configuration and `.stemma/` tools | [AGENTS.md](AGENTS.md) |
+| **Operations** | Agent instructions, shared skills, client configuration and `.stemma/` tools | [AGENTS.md](AGENTS.md), [tools](.stemma/README.md) |
 
 Research and Operations are excluded from the intended public release. Keep the
 working repository private when those records are private: an automated exporter
@@ -65,6 +65,21 @@ separate release artifacts.
 - **Optional agent skills** cover literature lookup, document extraction, scientific
   figures, and symbolic mathematics. Shared instructions live in `AGENTS.md`;
   `.claude/skills` links to `.agents/skills`.
+- **Markdown to PDF** renders notes and reports with math, figures and tables,
+  automatically omitting the opening editing contract:
+
+  ```bash
+  python .stemma/md2pdf.py path/to/REPORT.md
+  ```
+
+  Requires Pandoc and LuaLaTeX; see [tool usage](.stemma/README.md#markdown-to-pdf).
+
+## Template checks
+
+After [development setup](CONTRIBUTING.md#setup), run `python -m pytest .stemma/tests`
+for the tool regressions. PDF integration tests require Pandoc, LuaLaTeX and
+Poppler (`pdftotext`, `pdfinfo`); they are skipped when those tools are missing.
+Package checks are documented in [CONTRIBUTING.md](CONTRIBUTING.md#working-and-checking).
 
 ## TO DO
 
@@ -77,7 +92,7 @@ separate release artifacts.
 - **Release metadata:** supply license and `CITATION.cff` starters, and check for
   placeholders and broken links before publication.
 - **Template CI:** run instantiation, archive-boundary and `.stemma/` regression
-  checks. Current CI checks the package.
+  checks; include a PDF rendering environment. Current CI checks the package.
 - **Reproduction:** exercise a complete pilot release from a recorded environment
   and archived inputs, including the manuscript. Verify a lockfile workflow for
   analysis dependencies and document any cluster-specific setup.

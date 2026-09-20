@@ -212,3 +212,10 @@ Priorities beyond the root README's implementation gaps:
 - Do standalone notes stay reviewable as provisional drafts accumulate?
 - Automate chartering or source ingestion only when repeated use establishes a
   useful procedure and a checkable output.
+
+Report rendering is a single `.stemma/md2pdf.py` command using Pandoc and
+LuaLaTeX. These handle scientific Markdown without a parallel renderer, style
+package, or Python dependency. An opening blockquote is always treated as an editing
+contract and omitted; files without one still render and later quotes remain.
+Source files are never rewritten. Tests and a rendered specimen cover math,
+tables, figures, footnotes, and failed-build preservation.

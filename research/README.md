@@ -39,3 +39,6 @@ Name the active manuscript and pending reviews in `STATUS.md`. Preserve the
 researcher's draft; create an alternate draft only when requested. For imported
 material, record its source, version or date, review state, and known limits.
 Client memory must not be the only place this context lives.
+
+For a shareable PDF of a report or note, use the
+[Markdown converter](../.stemma/README.md#markdown-to-pdf).
