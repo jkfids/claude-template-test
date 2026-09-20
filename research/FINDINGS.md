@@ -10,5 +10,5 @@
 
 ## Results
 
-<!-- - Finding, stated precisely. Scope or conditions. Provenance:
-       `investigations/<slug>/REPORT.md`, `notes/<slug>`, or citekey. -->
+<!-- Claim, assumptions, limitations, and link to evidence. Attribute imported
+     literature results separately from results established by this project. -->

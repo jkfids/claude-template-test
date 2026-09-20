@@ -1,3 +1,5 @@
+<!-- Modified by Stemma. -->
+
 # LiteParse CLI Reference (`lit`)
 
 The **`lit`** command ships with `liteparse` (Python), `@llamaindex/liteparse` (npm), and `cargo install liteparse` (Rust). Behavior is the same across installs.
@@ -22,7 +24,7 @@ lit parse [OPTIONS] <file>
 | Option | Description |
 |--------|-------------|
 | `-o, --output <file>` | Write output to file (default: stdout) |
-| `--format <format>` | `json` or `text` (default: `text`) |
+| `--format <format>` | `json`, `text`, or `markdown` (default: `text`) |
 | `--no-ocr` | Disable OCR |
 | `--ocr-language <lang>` | Tesseract language (default: `eng`) |
 | `--ocr-server-url <url>` | HTTP OCR server base URL |
@@ -30,6 +32,7 @@ lit parse [OPTIONS] <file>
 | `--max-pages <n>` | Max pages (default: 1000) |
 | `--target-pages <pages>` | e.g. `1-5,10,15-20` |
 | `--dpi <dpi>` | Rendering DPI (default: 150) |
+| `--extract-text-metadata` | Include font metadata in text items |
 | `--preserve-small-text` | Keep very small text |
 | `--password <password>` | Encrypted document password |
 | `--num-workers <n>` | Concurrent OCR workers |
@@ -59,7 +62,7 @@ lit batch-parse [OPTIONS] <input-dir> <output-dir>
 
 | Option | Description |
 |--------|-------------|
-| `--format <format>` | `json` or `text` (default: `text`) |
+| `--format <format>` | `json`, `text`, or `markdown` (default: `text`) |
 | `--no-ocr` | Disable OCR |
 | `--ocr-language <lang>` | Tesseract language (default: `eng`) |
 | `--ocr-server-url <url>` | HTTP OCR server |
@@ -81,7 +84,8 @@ lit batch-parse ./papers ./parsed --format json --recursive
 lit batch-parse ./pdfs ./out --extension .pdf --no-ocr
 ```
 
-Output files mirror input basenames with `.txt` or `.json` extension.
+Output preserves relative subdirectories with `.txt`, `.json`, or `.md` extensions.
+Separate input extensions if basenames repeat, to avoid overwriting an output.
 
 ---
 

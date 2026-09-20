@@ -11,6 +11,4 @@
 
 ## Resolved
 
-<!-- - Copy of resolved question—do not restate answers. Point at the most
-       canonical record: `FINDINGS.md`, `DECISIONS.md`, a note, or a word of
-       why the question was retired or settled in passing. -->
+<!-- Original question and link to its accepted answer, or reason for retiring it. -->

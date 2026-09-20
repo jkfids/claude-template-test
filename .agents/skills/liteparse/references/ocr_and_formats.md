@@ -1,9 +1,11 @@
+<!-- Modified by Stemma. -->
+
 # OCR and Supported Input Formats
 
 ## Built-in OCR (Tesseract)
 
 - **Default:** OCR enabled on parse.
-- **Engine:** Tesseract bundled with the library (zero extra setup for typical English PDFs).
+- **Engine:** Tesseract bundled with the library; language data is downloaded and cached on first use.
 - **Disable** when PDFs have selectable text: `--no-ocr` or `ocr_enabled=False`.
 
 ```bash
@@ -111,33 +113,22 @@ choco install libreoffice-fresh
 
 On Windows, add LibreOffice `program` directory to PATH (often `C:\Program Files\LibreOffice\program`).
 
-### Images (ImageMagick)
+### Images (native conversion)
 
-Requires ImageMagick.
+No external converter is required.
 
 | Formats |
 |---------|
 | `.jpg`, `.jpeg`, `.png`, `.gif`, `.bmp`, `.tiff`, `.webp`, `.svg` |
-
-**Install ImageMagick:**
-
-```bash
-# macOS
-brew install imagemagick
-
-# Ubuntu/Debian
-sudo apt-get install imagemagick
-
-# Windows
-choco install imagemagick.app
-```
 
 ---
 
 ## Conversion pipeline
 
 ```text
-Office / image → (LibreOffice or ImageMagick) → PDF → PDFium extract → optional OCR → grid projection → text + JSON
+Office → LibreOffice → PDF
+Image → native conversion → PDF
+PDF → PDFium extract → optional OCR → text / JSON / Markdown
 ```
 
 If conversion fails, install the missing tool and retry. Plain-text-only paths cannot be screenshot-rendered.

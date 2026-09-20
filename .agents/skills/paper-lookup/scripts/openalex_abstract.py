@@ -57,8 +57,7 @@ def reconstruct(inverted_index: dict[str, list[int]]) -> tuple[str, list[str]]:
         )
 
     ordered = sorted(buckets)
-    expected = list(range(ordered[0], ordered[-1] + 1))
-    missing = len(expected) - len(ordered)
+    missing = ordered[-1] - ordered[0] + 1 - len(ordered)
     if missing:
         anomalies.append(f"{missing} position(s) absent from the index; the abstract has gaps")
     if ordered[0] != 0:

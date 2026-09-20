@@ -6,5 +6,5 @@
 > new decision and cite the one it supersedes. Agent-entered decisions arrive
 > by PR.
 
-<!-- - Decision. Alternatives considered, when applicable. Rationale where it
-       isn't obvious. -->
+<!-- Date and choice. Add rationale where useful; link the source and any
+     superseded decision. -->

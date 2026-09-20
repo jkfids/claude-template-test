@@ -6,37 +6,32 @@
 # Update hooks: pre-commit autoupdate
 # ==============================================================================
 
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      # On project initialization, replace the `exclude` regex below with the
-      # following:
-      #   files: '^([^/]+|(src|tests|data|reproduce|\.github)/.*)$'
+      # Cosmetic rewrites follow release code/config, not research or vendors.
       - id: trailing-whitespace  # Remove trailing whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: ^\.agents/skills/
+        files: '^([^/]+|(src|tests|data|reproduce|\.github)/.*)$'
+        exclude: ^PROJECT\.md$
       - id: end-of-file-fixer  # Ensure files end with a newline
-        exclude: ^\.agents/skills/
+        files: '^([^/]+|(src|tests|data|reproduce|\.github)/.*)$'
+        exclude: ^PROJECT\.md$
       - id: check-merge-conflict  # Catch unresolved merge conflict markers
       - id: check-added-large-files  # Block large files from being committed
         args: [--maxkb=5000]
       - id: detect-private-key  # Basic protection against committing private keys
       - id: check-toml  # Validate TOML syntax
       - id: check-yaml  # Validate YAML syntax
+      # Optional checks for repositories that use these file types/platforms.
+      # - id: check-json
+      # - id: check-symlinks
+      # - id: check-case-conflict
 
-      # Omitted by default
-      # - id: no-commit-to-branch  # Prevent committing to certain branches, may interfere with Stemma's git workflow
-      # - id: check-executables-have-shebangs  # Executable files must have a shebang
-      # - id: check-shebang-scripts-are-executable  # Shebang implies +x
-      # - id: check-json  # Validate JSON syntax
-      # - id: check-symlinks  # Catch broken symlinks
-      # - id: check-case-conflict  # Catch names that clash on case-insensitive filesystems
-
-# ruff linting and formatting
+# Ruff – keep the revision aligned with the dev dependency.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.0
+    rev: v0.16.8
     hooks:
       - id: ruff-check
         args: ["--fix"]
@@ -44,28 +39,24 @@ repos:
       - id: ruff-format
         files: ^(src|tests|reproduce)/
 
-# Strip Jupyter notebook output before commit.
-#   - repo: https://github.com/kynan/nbstripout
-#     rev: 0.9.1
-#     hooks:
-#       - id: nbstripout
+# ==============================================================================
+# Optional tools – enable when the project uses them
+# ==============================================================================
 
-# Shell script linting.
-#   - repo: https://github.com/shellcheck-py/shellcheck-py
-#     rev: v0.11.0.1
-#     hooks:
-#       - id: shellcheck
+# Strip notebook outputs; keep publication figures in reproduce/.
+#  - repo: https://github.com/kynan/nbstripout
+#    rev: 0.9.1
+#    hooks:
+#      - id: nbstripout
 
-# Stronger secret scanning than detect-private-key (API keys, tokens).
-# Requires a baseline file: `detect-secrets scan > .secrets.baseline` first.
-#   - repo: https://github.com/Yelp/detect-secrets
-#     rev: v1.5.0
-#     hooks:
-#       - id: detect-secrets
-#         args: ["--baseline", ".secrets.baseline"]
+# Lint shell scripts.
+#  - repo: https://github.com/shellcheck-py/shellcheck-py
+#    rev: v0.11.0.1
+#    hooks:
+#      - id: shellcheck
 
-# pyproject.toml formatting. Recommended to enable after pyproject.toml is stable.
-#   - repo: https://github.com/tox-dev/pyproject-fmt
-#     rev: v2.25.3
-#     hooks:
-#       - id: pyproject-fmt  # Canonicalize pyproject.toml formatting
+# Normalize pyproject.toml after settling its structure and comments.
+#  - repo: https://github.com/tox-dev/pyproject-fmt
+#    rev: v2.29.4
+#    hooks:
+#      - id: pyproject-fmt

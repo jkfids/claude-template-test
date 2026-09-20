@@ -1,4 +1,14 @@
+<!-- Modified by Stemma. -->
+
 # LiteParse Output Formats
+
+## Markdown output (`--format markdown`)
+
+```bash
+lit parse document.pdf --format markdown --no-ocr -o document.md
+```
+
+Inspect tables and equations against page images; extraction can lose structure.
 
 ## Text output (`--format text`)
 
@@ -11,6 +21,8 @@ Use text output when feeding chunkers, summarizers, or keyword search that do no
 ---
 
 ## JSON output (`--format json`)
+
+Font metadata requires `--extract-text-metadata` or `extract_text_metadata=True`.
 
 ### CLI
 

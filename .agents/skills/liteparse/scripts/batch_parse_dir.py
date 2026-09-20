@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+# Modified by Stemma.
 """
-Batch-parse documents in a directory with LiteParse (local only, no network).
+Batch-parse documents locally with LiteParse; OCR data may download on first use.
 
 Usage:
     python batch_parse_dir.py INPUT_DIR OUTPUT_DIR [--format json|text] [--no-ocr] [--recursive] [--extension .pdf]
@@ -96,13 +97,12 @@ def parse_one(
         result = parser.parse(file_path)
         out_name = f"{file_path.stem}.{'json' if fmt == 'json' else 'txt'}"
         out_path = output_dir / out_name
-        if fmt == "json":
-            out_path.write_text(
-                json.dumps(_result_to_dict(result), indent=2),
-                encoding="utf-8",
-            )
-        else:
-            out_path.write_text(result.text, encoding="utf-8")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        with out_path.open("x", encoding="utf-8") as output:
+            if fmt == "json":
+                json.dump(_result_to_dict(result), output, indent=2)
+            else:
+                output.write(result.text)
         return True, str(file_path), f"OK -> {out_name}"
     except Exception as exc:
         return False, str(file_path), str(exc)
@@ -136,6 +136,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = LiteParse(
         ocr_enabled=not args.no_ocr,
         output_format=args.format,
+        extract_text_metadata=args.format == "json",
         quiet=args.quiet,
     )
 
@@ -146,7 +147,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     ok, fail = 0, 0
     for fp in files:
-        success, path, msg = parse_one(parser, fp, args.output_dir, args.format)
+        success, path, msg = parse_one(parser, fp, args.output_dir / fp.relative_to(args.input_dir).parent, args.format)
         if success:
             ok += 1
             if not args.quiet:

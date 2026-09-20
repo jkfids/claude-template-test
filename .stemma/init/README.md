@@ -31,7 +31,7 @@ cd <project-name>
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e .  # For devs:  pip install -e ".[dev]"
+python -m pip install -e .
 ```
 
 **Run**

@@ -1,3 +1,5 @@
+<!-- Modified by Stemma. -->
+
 # Choosing a Document Parser
 
 Use this guide to pick the right tool in the scientific-agent-skills repo (or LlamaParse for cloud escalation).
@@ -7,7 +9,7 @@ flowchart TD
   start[User has a document task]
   start --> q1{Need PDF merge split forms or encryption utilities?}
   q1 -->|yes| pdfSkill[pdf skill]
-  q1 -->|no| q2{Need Markdown audio video EPUB or Azure table extraction?}
+  q1 -->|no| q2{Need audio video EPUB or Azure table extraction?}
   q2 -->|yes| markitdown[markitdown skill]
   q2 -->|no| q3{Need bounding boxes fast local parse or page PNGs for agents?}
   q3 -->|yes| liteparse[liteparse skill]
@@ -20,7 +22,7 @@ flowchart TD
 
 | Criterion | LiteParse | MarkItDown | pdf skill | LlamaParse |
 |-----------|-----------|------------|-----------|------------|
-| **Primary output** | Layout text + JSON with bboxes | Markdown | PDF bytes / extracted text | Structured markdown / JSON (cloud) |
+| **Primary output** | Markdown + layout text + JSON with bboxes | Markdown | PDF bytes / extracted text | Structured markdown / JSON (cloud) |
 | **Runs locally** | Yes | Yes | Yes | No (cloud API) |
 | **Bounding boxes** | Yes | No | Limited | Yes (cloud) |
 | **OCR** | Tesseract + optional HTTP OCR | Yes (images/PDF) | Via external tools | Advanced |
@@ -42,7 +44,7 @@ flowchart TD
 
 ### Choose **MarkItDown** when
 
-- The downstream step expects **Markdown** (RAG, summarization, notebook ingestion).
+- You need **Markdown** from formats LiteParse does not support.
 - Inputs include **HTML, EPUB, audio, YouTube**, or you want **Azure Document Intelligence** for tables.
 - You do not need per-span bounding boxes.
 
@@ -64,7 +66,7 @@ Common pipelines:
 
 1. **LiteParse → chunk + embed** — JSON/text for vector store; bboxes for UI highlights.
 2. **LiteParse screenshots + vision model** — figures and tables; text JSON for search.
-3. **LiteParse text → MarkItDown-style post-processing** — only if you must have Markdown; otherwise use LiteParse text directly.
+3. **LiteParse Markdown** — use `--format markdown` for structured text consumers.
 4. **pdf skill merge** → **LiteParse parse** — assemble supplementary PDFs, then extract.
 
-Avoid running LiteParse and MarkItDown on the same file unless you have distinct consumers (coordinates vs Markdown).
+Avoid running multiple parsers on the same file unless their outputs serve distinct needs.

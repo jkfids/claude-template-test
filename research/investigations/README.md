@@ -1,73 +1,51 @@
 # Investigations
 
-Bounded units of research work. Each investigation pursues one stated
-objective with a recognizable endpoint, lives in its own directory copied
-from `_template/`, is worked on its own branch, and is closed by a single
-pull request.
+Bounded research with a stated objective and recognizable endpoint. Each has
+its own directory, branch, and PR:
 
-## Template layout
+- `README.md`: objective, scope, completion criterion, and current state.
+- `ANALYSIS.md`: working technical record and reproduction details.
+- `REPORT.md`: concise final account supported by the analysis.
 
-- `README.md` – The landing page and central directory of the investigation.
-- `ANALYSIS.md` – The detailed, working scientific and technical document.
-- `REPORT.md` – The final reviewed account and primary exportable artifact.
+## Charter
 
-## Conventions
-
-- Name investigation directories with a short hyphenated title,
-  `<short-title>/`, and the branch `investigation/<short-title>`. Names are
-  unique for the life of the project.
-- Nothing enters `main` until close. Chartering opens a **draft pull request**
-  as the visible registry of active investigations, and it becomes the closing
-  pull request at the end.
-- Investigation branches do not modify the Release zone (`src/`, `tests/`,
-  `manuscript/`, …). If release changes are needed mid-investigation, edit
-  and verify them in place, but commit them on a separate branch off `main`,
-  then merge (rather than rebase) `main` back into the investigation branch.
-- A human merges the closing pull request—the merge is the acceptance.
-- Prefer flat investigation directories; add subdirectories (`figures/`,
-  `data/`) only once files accumulate.
-- Results quoted in `ANALYSIS.md` and `REPORT.md` trace to scripts in the
-  investigation directory, runnable from the repository root; fix and record
-  any seeds.
-
-## Lifecycle
-
-### 1. Charter
-
-Create the investigation branch from `main`, copy the template to a new
-directory, and fill in its `README.md`: its objective, its scope, and its
-completion criterion.
+Use a unique, short hyphenated name. From the repository root:
 
 ```bash
-# In project root.
-slug="<short-title>"  # Replace.
-git switch main
-git switch -c "investigation/${slug}"
+slug="<short-title>"
+git fetch origin
+git worktree add -b "investigation/${slug}" "../investigation-${slug}" origin/main
+cd "../investigation-${slug}"
 mkdir "research/investigations/${slug}"
 cp -R research/investigations/_template/. "research/investigations/${slug}/"
 ```
 
-Fill in `research/investigations/${slug}/README.md`, then commit and push
-the investigation branch, and open the draft pull request.
+Fill in the investigation README, then register it with a draft PR:
 
 ```bash
-# Make sure to re-set slug if the previous shell session was closed:
-# slug="<short-title>"
 git add "research/investigations/${slug}"
 git commit -m "Charter investigation: ${slug}"
 git push -u origin "investigation/${slug}"
-gh pr create --draft --title "Investigation: ${slug}" --fill  # Or open a draft PR from GitHub.
+gh pr create --draft --title "Investigation: ${slug}" --fill
 ```
 
-### 2. Work
+Nothing enters `main` until close. This draft becomes the closing PR.
 
-Commit directly on the branch. Develop the research in `ANALYSIS.md` and
-supporting artifacts; keep the investigation `README.md` current. `REPORT.md`
-may be drafted as results stabilize, but must not lead the analysis.
+## Work
 
-### 3. Close
+Commit on the investigation branch. Keep its README current and develop the
+evidence in `ANALYSIS.md`. Add supporting files as needed; keep the directory
+flat until subdirectories help. For computations, record commands runnable
+from the repository root, environment, inputs, and seeds.
 
-Complete `REPORT.md`, finalize the investigation `README.md`, and add the
-resulting updates to `research/`'s memory files. Then mark the draft pull
-request ready for review. Keep unrelated housekeeping and release-facing
-changes out of it. Once merged, delete the branch.
+If Release changes are needed, implement and verify them in a separate worktree
+on a branch from `main`, with their own PR. Track that dependency in the
+investigation README. After human merge, fetch and merge updated `main` into
+the investigation branch; do not rebase a shared branch.
+
+## Close
+
+Complete `REPORT.md`, finalize the README, and propose the resulting memory
+updates in the same PR. Keep its scope to this investigation and affected
+memory files. Mark it ready for review; delete the branch after human merge.
+Acceptance and charter changes follow [AGENTS.md](../../AGENTS.md#rules).

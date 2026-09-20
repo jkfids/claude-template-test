@@ -8,25 +8,22 @@
 
 **Opened:** <!-- YYYY-MM-DD -->
 
-## Description
+## Objective
 
-<!-- State the question or objective precisely. Provide context if it is not
-     obvious. -->
+<!-- The question or objective, with enough context to understand it. -->
 
 ## Scope
 
-<!-- What is included and excluded: the boundaries of the investigation.-->
+<!-- What is included and excluded. -->
 
 ## Completion criterion
 
-<!-- What would be sufficient to conclude the investigation, stated so that
-     someone else could tell when it has been met. -->
+<!-- An endpoint another researcher can recognize. -->
 
 ## Current state
 
-<!-- Briefly describe what has been completed, what remains, and any blocker.
-     Do not duplicate the detailed analysis. At close, replace with a short
-     summary of the outcome. -->
+<!-- Results so far, checks, uncertainty, and next step. Link dependencies or
+     blockers. At close, replace with the outcome; keep evidence in ANALYSIS.md. -->
 
 ## Directory
 

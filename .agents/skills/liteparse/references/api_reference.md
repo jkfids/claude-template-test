@@ -1,6 +1,8 @@
+<!-- Modified by Stemma. -->
+
 # LiteParse API Reference
 
-Targets **liteparse 2.0.0** (Python) and **@llamaindex/liteparse** (Node). Rust crate: `liteparse = "2"`.
+Python examples target **liteparse 2.14.6**; Node examples use **@llamaindex/liteparse**. Rust crate: `liteparse = "2"`.
 
 ## Python: `LiteParse`
 
@@ -19,7 +21,8 @@ from liteparse import LiteParse, ParseResult, ParsedPage, TextItem, ScreenshotRe
 | `max_pages` | int | `1000` | Maximum pages to parse |
 | `target_pages` | str \| None | `None` | e.g. `"1-5,10,15-20"` |
 | `dpi` | float | `150` | Render DPI (OCR / screenshots) |
-| `output_format` | str | `"json"` | `"json"` or `"text"` (affects native output mode) |
+| `output_format` | str | `"json"` | `"json"`, `"text"`, or `"markdown"` (affects native output mode) |
+| `extract_text_metadata` | bool | `False` | Include font metadata in text items |
 | `preserve_very_small_text` | bool | `False` | Keep very small text runs |
 | `password` | str \| None | `None` | Encrypted PDF password |
 | `quiet` | bool | `False` | Suppress progress output |
@@ -83,7 +86,7 @@ class ScreenshotResult:
     image_bytes: bytes
 ```
 
-Non-PDF formats are converted when LibreOffice/ImageMagick are installed.
+Office formats require LibreOffice; images are converted natively.
 
 ### `get_config()`
 

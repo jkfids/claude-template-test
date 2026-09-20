@@ -1,60 +1,41 @@
 # Research
 
-The project's private scientific workspace and shared memory: the context,
-working records, evidence, and accumulated understanding needed to continue
-the research across collaborators and agent sessions. Nothing here is exported
-or published, and nothing in the Release zone may depend on this directory.
+Private research records and shared project memory, excluded from release.
 
-## Project memory
+## Memory
 
-[`../PROJECT.md`](../PROJECT.md) – Durable definition of the project, what it
-is, why it exists, who is involved.
+- [PROJECT.md](../PROJECT.md): purpose, scope, and people.
+- [STATUS.md](STATUS.md): current work, review state, and next steps.
+- [FINDINGS.md](FINDINGS.md): accepted claims, their scope, and evidence.
+- [DECISIONS.md](DECISIONS.md): accepted choices and rationale.
+- [QUESTIONS.md](QUESTIONS.md): unresolved research questions and links to answers.
+- [SURVEY.md](SURVEY.md): synthesis of the literature and its relation to the project.
 
-[`STATUS.md`](STATUS.md) – Rough project snapshot: current tasks and priorities.
+## Working records
 
-[`FINDINGS.md`](FINDINGS.md) – Canonical scientific knowledge that the project
-is prepared to rely on.
+- [Investigations](investigations/README.md): bounded work with a charter and report.
+- [Literature](literature/README.md): technical notes on individual sources.
+- [Meetings](meetings/README.md): discussions, decisions, and actions.
+- [Notes](notes/): derivations, writeups, and collaborator material.
+- [Workbench](workbench/): exploratory scripts, notebooks, and calculations.
 
-[`DECISIONS.md`](DECISIONS.md) – Project-level methodological, technical, and
-strategic choices.
+## Evidence and acceptance
 
-[`SURVEY.md`](SURVEY.md) – Synthesis of relevant literature.
+Working records and manuscript drafts are provisional. Promote supported
+claims or choices into `FINDINGS.md` or `DECISIONS.md` through
+[review](../AGENTS.md#rules), linking evidence rather than repeating it.
+Evidence may be an investigation report, a self-contained note, or a verified
+source; state the claim, assumptions, and limitations where the evidence lives.
+Attribute literature results separately from project results.
 
-[`QUESTIONS.md`](QUESTIONS.md) – Unresolved questions of research significance.
+## Resuming and handing off work
 
-## Working directories
+Read `PROJECT.md` and `STATUS.md`, then follow links relevant to the task.
+Before pausing substantial work, update its existing record with results,
+checks, uncertainty, and the next step. Keep project coordination in `STATUS.md`
+and investigation state in its README; keep derivations beside the evidence.
 
-[**[README]**](investigations/README.md) [`investigations/`](investigations/) –
-Bounded units of research; conventions and operating notes in its README.
-
-[**[README]**](literature/README.md) [`literature/`](literature/) – Per-source
-notes on the external literature, one file per bibliography citekey.
-
-[**[README]**](meetings/README.md) [`meetings/`](meetings/) – Project meeting
-records; one directory per meeting.
-
-[`notes/`](notes/) – Durable, free-form research records: derivations, logbook
-entries, writeups, collaborator material.
-
-[`workbench/`](workbench/) – Scratch workspace for exploratory analysis,
-temporary scripts, notebooks, and raw derivations.
-
-## How to use
-
-Begin with PROJECT.md for stable context and STATUS.md for the current
-state, then follow links into the material relevant to the work at hand.
-
-Raw notes, conversational conclusions, meeting transcripts, workbench outputs,
-and active investigations are provisional—they may support a conclusion, but
-they are not canonical knowledge by themselves. Important conclusions are
-promoted into a legible record stating the claim, its support, scope,
-limitations, and pointers to the underlying evidence. This will typically
-be an investigation's report, or a self-contained writeup in `notes/`.
-Entries in `FINDINGS.md` and `DECISIONS.md` link to that provenance rather
-than reproducing it.
-
-A conclusion becomes canonical through a pull request. A human, never an
-agent, merges it; the merge is the acceptance. Other work in `research/` is
-committed directly, including on active investigation branches. Write for
-the next researcher or agent who must understand, assess, and continue the
-work.
+Name the active manuscript and pending reviews in `STATUS.md`. Preserve the
+researcher's draft; create an alternate draft only when requested. For imported
+material, record its source, version or date, review state, and known limits.
+Client memory must not be the only place this context lives.
