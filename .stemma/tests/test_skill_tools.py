@@ -112,3 +112,24 @@ def test_scientific_figure_export_refuses_overwrite(tmp_path):
     )
     assert result.returncode == 2
     assert output.read_bytes() == b"existing figure"
+
+
+@pytest.mark.parametrize(
+    "rotation,width_pt,height_pt",
+    [(0, 72, 144), (90, 144, 72), (180, 72, 144), (270, 144, 72)],
+)
+def test_pdf_metadata_uses_displayed_dimensions(tmp_path, rotation, width_pt, height_pt):
+    pytest.importorskip("pypdf")
+    from pypdf import PdfWriter
+
+    path = tmp_path / "rotated.pdf"
+    writer = PdfWriter()
+    writer.add_blank_page(width=72, height=144).rotate(rotation)
+    writer.write(path)
+    result = run_script("scientific-visualization", "image_metadata.py", path)
+    assert result.returncode == 0, result.stderr
+    metadata = json.loads(result.stdout)["metadata"]
+    assert metadata["first_page_width_pt"] == width_pt
+    assert metadata["first_page_height_pt"] == height_pt
+    assert metadata["width_mm"] == pytest.approx(width_pt / 72 * 25.4)
+    assert metadata["height_mm"] == pytest.approx(height_pt / 72 * 25.4)

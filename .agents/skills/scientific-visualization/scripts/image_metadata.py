@@ -354,6 +354,8 @@ def inspect_pdf(path: Path) -> dict[str, Any]:
         page = reader.pages[0]
         width_pt = float(page.mediabox.width)
         height_pt = float(page.mediabox.height)
+        if page.rotation % 180 == 90:
+            width_pt, height_pt = height_pt, width_pt
         return {
             "format": "PDF",
             "kind": "vector-container",
