@@ -25,10 +25,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and checks, and
 
 ## Rules
 
-- Release changes, investigations, and canonical claims require PRs. Small
-  changes to Operations and provisional notes may be committed directly.
-  Agents open and update PRs; never merge them or enable auto-merge.
-  A human merges; the merge is acceptance.
+- Small configuration and housekeeping changes, including in Release, and
+  provisional notes may be committed directly to `main`. Other Release changes,
+  investigations, and canonical claims require PRs. Agents open and update PRs;
+  never merge them or enable auto-merge. A human merges; the merge is acceptance.
 - Do not change an investigation's objective, scope, or completion criterion
   without the researcher's approval. Propose the change and wait.
 - Investigation branches do not modify Release. Follow the

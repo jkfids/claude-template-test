@@ -9,12 +9,15 @@ its own directory, branch, and PR:
 
 ## Charter
 
-Use a unique, short hyphenated name. From the repository root:
+Use a unique, short hyphenated name. Check local `main` against `origin/main`
+before chartering; retain intended local commits when choosing the starting
+state. From the repository root:
 
 ```bash
 slug="<short-title>"
 git fetch origin
-git worktree add -b "investigation/${slug}" "../investigation-${slug}" origin/main
+git log --oneline --left-right main...origin/main
+git worktree add -b "investigation/${slug}" "../investigation-${slug}" main
 cd "../investigation-${slug}"
 mkdir "research/investigations/${slug}"
 cp -R research/investigations/_template/. "research/investigations/${slug}/"
@@ -39,9 +42,10 @@ flat until subdirectories help. For computations, record commands runnable
 from the repository root, environment, inputs, and seeds.
 
 If Release changes are needed, implement and verify them in a separate worktree
-on a branch from `main`, with their own PR. Track that dependency in the
-investigation README. After human merge, fetch and merge updated `main` into
-the investigation branch; do not rebase a shared branch.
+from `main`, following the change policy in [AGENTS.md](../../AGENTS.md#rules).
+Track that dependency in the investigation README. Once the change reaches
+`main`, fetch and merge updated `main` into the investigation branch; do not
+rebase a shared branch.
 
 ## Close
 
